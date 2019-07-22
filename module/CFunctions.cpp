@@ -25,8 +25,10 @@ int CFunctions::sign_jwt_token(lua_State* lua_vm)
 	const auto algorithm	= lua_tostring(lua_vm, 2);
 	const auto secret		= lua_tostring(lua_vm, 3);
 
+	const auto& now = std::chrono::system_clock::now();
 	auto jwt = jwt::create()
-		.set_issued_at(std::chrono::system_clock::now());
+		.set_issued_at(now)
+		.set_not_before(now);
 
 	// Add claims
 	for (const auto& pair : result)
