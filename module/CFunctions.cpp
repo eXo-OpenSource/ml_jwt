@@ -21,7 +21,7 @@ int CFunctions::sign_jwt_token(lua_State* lua_vm)
 		return 1;
 	}
 
-	const auto result    = Utils::parse_named_table(lua_vm, 1);
+	const auto claims    = Utils::parse_named_table(lua_vm, 1);
 	const auto algorithm = lua_tostring(lua_vm, 2);
 	const auto secret    = lua_tostring(lua_vm, 3);
 
@@ -31,7 +31,7 @@ int CFunctions::sign_jwt_token(lua_State* lua_vm)
 		.set_not_before(now);
 
 	// Add claims
-	for (const auto& pair : result)
+	for (const auto& pair : claims)
 	{
 		jwt.set_payload_claim(pair.first, pair.second);
 	}

@@ -3,10 +3,7 @@
 #include <unordered_map>
 #include <ostream>
 #include <iostream>
-
-struct lua_State;
-
-extern ILuaModuleManager10* pModuleManager;
+#include "CFunctions.h"
 
 class Utils
 {
@@ -21,7 +18,7 @@ public:
 			if (lua_type(lua_vm, -1) != LUA_TSTRING || lua_type(lua_vm, -2) != LUA_TSTRING)
 			{
 				stringstream ss;
-				ss << "Bad Argument @ parse_named_table. Got invalid table entry, expect key(string) and value(string), but was key(" << lua_typename(lua_vm, lua_type(lua_vm, -2)) << ") and value(" << lua_typename(lua_vm, lua_type(lua_vm, -1)) << "). Skipping...";
+				ss << "Bad Argument @ parse_named_table. Got invalid table entry, expected key(string) and value(string), but was key(" << lua_typename(lua_vm, lua_type(lua_vm, -2)) << ") and value(" << lua_typename(lua_vm, lua_type(lua_vm, -1)) << "). Skipping...";
 				pModuleManager->ErrorPrintf(ss.str().c_str());
 				lua_error(lua_vm);
 				break;

@@ -20,5 +20,4 @@ solution "JWT"
 		optimize "On"
 
 	include "module"
-	-- include "pathfind"
 	include "test"
