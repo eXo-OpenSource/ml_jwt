@@ -6,6 +6,8 @@
 
 struct lua_State;
 
+extern ILuaModuleManager10* pModuleManager;
+
 class Utils
 {
 public:
@@ -16,7 +18,16 @@ public:
 		lua_pushnil(lua_vm);
 		while(lua_next(lua_vm, index) != 0)
 		{
-			result[lua_tostring(lua_vm, -1)] = lua_tostring(lua_vm, -2);
+			if (lua_type(lua_vm, -1) != LUA_TSTRING || lua_type(lua_vm, -2) != LUA_TSTRING)
+			{
+				stringstream ss;
+				ss << "Bad Argument @ parse_named_table. Got invalid table entry, expect key(string) and value(string), but was key(" << lua_typename(lua_vm, lua_type(lua_vm, -2)) << ") and value(" << lua_typename(lua_vm, lua_type(lua_vm, -1)) << "). Skipping...";
+				pModuleManager->ErrorPrintf(ss.str().c_str());
+				lua_error(lua_vm);
+				break;
+			}
+
+			result[lua_tostring(lua_vm, -2)] = lua_tostring(lua_vm, -1);
 			lua_pop(lua_vm, 1);
 		}
 
