@@ -61,12 +61,6 @@ int CFunctions::verify_jwt_token(lua_State* lua_vm)
 
 		verifier.verify(decoded_jwt);
 
-		for(auto& e : decoded_jwt.get_payload_claims()) {
-			std::stringstream ss;
-			ss << e.first << " = " << e.second.to_json() << std::endl;
-			pModuleManager->DebugPrintf(lua_vm, ss.str().c_str());
-		}
-
 		lua_pushboolean(lua_vm, true);
 		return 1;
 	} catch (exception& e)
