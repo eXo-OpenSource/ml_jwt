@@ -6,6 +6,8 @@
 #include <jwt-cpp/jwt.h>
 #include <sstream>
 #include "UItils.h"
+#include <fstream>
+#include "Crypto.h"
 
 #ifndef _WIN32
 	#include <sys/stat.h>
@@ -13,17 +15,31 @@
 
 int CFunctions::sign_jwt_token(lua_State* lua_vm)
 {
-	// string jwtSign(table claims, string algorithm, string secret)
-	if (lua_type(lua_vm, 1) != LUA_TTABLE || lua_type(lua_vm, 2) != LUA_TSTRING || lua_type(lua_vm, 3) != LUA_TSTRING)
+	// string jwtSign(table claims, string algorithm, string secret/publicKeyPath, string? privateKey)
+	if (lua_type(lua_vm, 1) != LUA_TTABLE || lua_type(lua_vm, 2) != LUA_TSTRING || lua_type(lua_vm, 3) != LUA_TSTRING || 
+		(lua_type(lua_vm, 4) != LUA_TNONE && lua_type(lua_vm, 4) != LUA_TSTRING))
 	{
 		pModuleManager->ErrorPrintf("Bad argument @ jwtSign\n");
 		lua_pushboolean(lua_vm, false);
 		return 1;
 	}
+	
+	const auto claims           = Utils::parse_named_table(lua_vm, 1);
+	const auto algorithm        = lua_tostring(lua_vm, 2);
+	const auto public_key_path  = lua_tostring(lua_vm, 3);
+	const auto private_key_path = lua_tostring(lua_vm, 4);
 
-	const auto claims    = Utils::parse_named_table(lua_vm, 1);
-	const auto algorithm = lua_tostring(lua_vm, 2);
-	const auto secret    = lua_tostring(lua_vm, 3);
+	std::string public_key = public_key_path, private_key;
+	if (lua_type(lua_vm, 4) != LUA_TNONE)
+	{
+		std::string pub_path;
+		if (!Crypto::read_key_pair(public_key_path, private_key_path, &public_key, &private_key))
+		{
+			pModuleManager->ErrorPrintf("Bad argument @ jwtVerify\n");
+			lua_pushboolean(lua_vm, false);
+			return 1;
+		}
+	}
 
 	const auto& now = std::chrono::system_clock::now();
 	auto jwt = jwt::create()
@@ -36,28 +52,42 @@ int CFunctions::sign_jwt_token(lua_State* lua_vm)
 		jwt.set_payload_claim(pair.first, pair.second);
 	}
 
-	lua_pushstring(lua_vm, jwt.sign(jwt::algorithm::hs256{ secret }).c_str());
+	lua_pushstring(lua_vm, jwt.sign(jwt::algorithm::hs256(public_key)).c_str());
 	return 1;
 }
 
 int CFunctions::verify_jwt_token(lua_State* lua_vm)
 {
-	// bool jwtVerify(string token, string algorithm, string secret)
-	if (lua_type(lua_vm, 1) != LUA_TSTRING || lua_type(lua_vm, 2) != LUA_TSTRING || lua_type(lua_vm, 3) != LUA_TSTRING)
+	// bool jwtVerify(string token, string algorithm, string secret/publicKeyPath, string? privateKey)
+	if (lua_type(lua_vm, 1) != LUA_TSTRING || lua_type(lua_vm, 2) != LUA_TSTRING || lua_type(lua_vm, 3) != LUA_TSTRING ||
+		(lua_type(lua_vm, 4) != LUA_TNONE && lua_type(lua_vm, 4) != LUA_TSTRING))
 	{
 		pModuleManager->ErrorPrintf("Bad argument @ jwtVerify\n");
 		lua_pushboolean(lua_vm, false);
 		return 1;
 	}
 
-	const auto token     = lua_tostring(lua_vm, 1);
-	const auto algorithm = lua_tostring(lua_vm, 2);
-	const auto secret    = lua_tostring(lua_vm, 3);
+	const auto token            = lua_tostring(lua_vm, 1);
+	const auto algorithm        = lua_tostring(lua_vm, 2);
+	const auto public_key_path  = lua_tostring(lua_vm, 3);
+	const auto private_key_path = lua_tostring(lua_vm, 4);
+
+	std::string public_key = public_key_path, private_key;
+	if (lua_type(lua_vm, 4) != LUA_TNONE)
+	{
+		std::string pub_path;
+		if (!Crypto::read_key_pair(public_key_path, private_key_path, &public_key, &private_key))
+		{
+			pModuleManager->ErrorPrintf("Bad argument @ jwtVerify\n");
+			lua_pushboolean(lua_vm, false);
+			return 1;
+		}
+	}
 
 	try {
 		const auto decoded_jwt = jwt::decode(token);
 		jwt::verify()
-			.allow_algorithm(jwt::algorithm::hs256{ secret })
+			.allow_algorithm(jwt::algorithm::hs256(public_key))
 			.verify(decoded_jwt);
 
 		lua_pushboolean(lua_vm, true);

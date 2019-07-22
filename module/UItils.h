@@ -28,5 +28,24 @@ public:
 		}
 
 		return result;
-	} 
+	}
+
+	static inline bool format_path(lua_State* lua_vm, const std::string& input_path, std::string* formatted_path)
+	{
+		char buf[300];
+		if (!pModuleManager->GetResourceFilePath(lua_vm, input_path.c_str(), buf, sizeof(buf)))
+		{
+			return false;
+		}
+
+		// Check if path is valid
+		const std::string path{ buf };
+		if (path.find("..") != std::string::npos)
+		{
+			return false;
+		}
+
+		*formatted_path = path;
+		return true;
+	}
 };
