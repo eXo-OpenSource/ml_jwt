@@ -34,18 +34,19 @@ MTAEXPORT bool InitModule(ILuaModuleManager10* pManager, char* szModuleName, cha
     return true;
 }
 
-MTAEXPORT void RegisterFunctions(lua_State* luaVM)
+MTAEXPORT void RegisterFunctions(lua_State* lua_vm)
 {
-	if (!pModuleManager || !luaVM)
+	if (!pModuleManager || !lua_vm)
 		return;
 
 	// Add lua vm to states list (to check validity)
-	g_Module->AddLuaVM(luaVM);
+	g_Module->AddLuaVM(lua_vm);
 
 	// Register functions
-	pModuleManager->RegisterFunction(luaVM, "jwtTest",		&CFunctions::Test);
-	pModuleManager->RegisterFunction(luaVM, "jwtSign",		&CFunctions::SignJWTToken);
-	pModuleManager->RegisterFunction(luaVM, "jwtVerify",	&CFunctions::VerifyJWTToken);
+	pModuleManager->RegisterFunction(lua_vm, "jwtTest",			&CFunctions::Test);
+	pModuleManager->RegisterFunction(lua_vm, "jwtSign",			&CFunctions::sign_jwt_token);
+	pModuleManager->RegisterFunction(lua_vm, "jwtVerify",		&CFunctions::verify_jwt_token);
+	pModuleManager->RegisterFunction(lua_vm, "jwtGetClaims",	&CFunctions::get_jwt_claims);
 }
 
 MTAEXPORT bool DoPulse()
