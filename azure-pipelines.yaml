@@ -4,7 +4,7 @@ jobs:
     vmImage: 'windows-2019'
 
   strategy:
-    maxParrallel: 2
+    maxParallel: 2
     matrix:
       win32Job:
         platform: 'x86'
