@@ -22,6 +22,7 @@ before_script:
 script:
   - make -j 3 CXX=$ENV_CXX CC=$ENV_CC config=release_x64
   - cd ..
+  - ls -la -R
   - mv Bin/Release/libml_pathfind.so Bin/Release/ml_pathfind.so
 
 # deploy:
