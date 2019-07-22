@@ -1,14 +1,14 @@
 jobs:
-- job: windows
+- job: Windows
   pool:
     vmImage: 'windows-2019'
 
   strategy:
     maxParallel: 2
     matrix:
-      win32Job:
-        platform: 'x86'
-      win64Job:
+      Win32:
+        platform: 'win32'
+      x64:
         platform: 'x64'
   variables:
     solution: 'Build/JWT.sln'
