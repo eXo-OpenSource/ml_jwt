@@ -8,6 +8,42 @@
 	#include <sys/stat.h>
 #endif
 
+int CFunctions::Test(lua_State* luaVM)
+{
+	pModuleManager->DebugPrintf(luaVM, "Module works! JWT ASDOIKFHÜSPAO!");
+	lua_pushstring(luaVM, "FUCK YOU!");
+	lua_pushboolean(luaVM, false);
+	return 2;
+}
+
+int CFunctions::SignJWTToken(lua_State* luaVM)
+{
+	// string jwtSign(string payload, string algorithm, string secret)
+	if (lua_type(luaVM, 1) != LUA_TSTRING || lua_type(luaVM, 2) != LUA_TSTRING || lua_type(luaVM, 3) != LUA_TSTRING)
+	{
+		pModuleManager->ErrorPrintf("Bad argument @ jwtSign\n");
+		lua_pushboolean(luaVM, false);
+		return 1;
+	}
+
+	lua_pushstring(luaVM, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c");
+	return 1;
+}
+
+int CFunctions::VerifyJWTToken(lua_State* luaVM)
+{
+	// bool jwtVerify(string token, string algorithm, string secret)
+	if (lua_type(luaVM, 1) != LUA_TSTRING || lua_type(luaVM, 2) != LUA_TSTRING || lua_type(luaVM, 3) != LUA_TSTRING)
+	{
+		pModuleManager->ErrorPrintf("Bad argument @ jwtVerify\n");
+		lua_pushboolean(luaVM, false);
+		return 1;
+	}
+
+	lua_pushboolean(luaVM, false);
+	return 1;
+}
+
 /*
 int CFunctions::LoadPathGraph(lua_State* luaVM)
 {
@@ -25,7 +61,7 @@ int CFunctions::LoadPathGraph(lua_State* luaVM)
 		pModuleManager->ErrorPrintf("File does not exist @ loadPathGraph\n");
 		lua_pushboolean(luaVM, false);
 		return 1;
-	}
+	-}
 
 	// Check if path is valid
 	std::string path{ buf };

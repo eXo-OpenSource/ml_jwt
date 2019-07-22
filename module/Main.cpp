@@ -40,14 +40,9 @@ MTAEXPORT void RegisterFunctions(lua_State* luaVM)
 	g_Module->AddLuaVM(luaVM);
 
 	// Register functions
-	/*
-	pModuleManager->RegisterFunction(luaVM, "loadPathGraph", &CFunctions::LoadPathGraph);
-	pModuleManager->RegisterFunction(luaVM, "unloadPathGraph", &CFunctions::UnloadPathGraph);
-	pModuleManager->RegisterFunction(luaVM, "findShortestPathBetween", &CFunctions::FindShortestPathBetween);
-	pModuleManager->RegisterFunction(luaVM, "isGraphLoaded", &CFunctions::IsGraphLoaded);
-	pModuleManager->RegisterFunction(luaVM, "findNodeAt", &CFunctions::FindNodeAt);
-	pModuleManager->RegisterFunction(luaVM, "getNodeNeighbors", &CFunctions::GetNodeNeighbors);
-	*/
+	pModuleManager->RegisterFunction(luaVM, "jwtTest", &CFunctions::Test);
+	pModuleManager->RegisterFunction(luaVM, "jwtSign", &CFunctions::SignJWTToken);
+	pModuleManager->RegisterFunction(luaVM, "jwtVerify", &CFunctions::VerifyJWTToken);
 }
 
 MTAEXPORT bool DoPulse()

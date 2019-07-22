@@ -15,6 +15,4 @@ project "test"
 		"premake5.lua",
 		"**.cpp",
 		"**.h",
-
-		"testnodes1.json"
 	}
