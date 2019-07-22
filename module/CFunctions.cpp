@@ -21,9 +21,9 @@ int CFunctions::sign_jwt_token(lua_State* lua_vm)
 		return 1;
 	}
 
-	const auto result		= Utils::parse_named_table(lua_vm, 1);
-	const auto algorithm	= lua_tostring(lua_vm, 2);
-	const auto secret		= lua_tostring(lua_vm, 3);
+	const auto result    = Utils::parse_named_table(lua_vm, 1);
+	const auto algorithm = lua_tostring(lua_vm, 2);
+	const auto secret    = lua_tostring(lua_vm, 3);
 
 	const auto& now = std::chrono::system_clock::now();
 	auto jwt = jwt::create()
@@ -50,16 +50,15 @@ int CFunctions::verify_jwt_token(lua_State* lua_vm)
 		return 1;
 	}
 
-	const auto token		= lua_tostring(lua_vm, 1);
-	const auto algorithm	= lua_tostring(lua_vm, 2);
-	const auto secret		= lua_tostring(lua_vm, 3);
+	const auto token     = lua_tostring(lua_vm, 1);
+	const auto algorithm = lua_tostring(lua_vm, 2);
+	const auto secret    = lua_tostring(lua_vm, 3);
 
 	try {
 		const auto decoded_jwt = jwt::decode(token);
-		const auto verifier = jwt::verify()
-			.allow_algorithm(jwt::algorithm::hs256{ secret });
-
-		verifier.verify(decoded_jwt);
+		jwt::verify()
+			.allow_algorithm(jwt::algorithm::hs256{ secret })
+			.verify(decoded_jwt);
 
 		lua_pushboolean(lua_vm, true);
 		return 1;
