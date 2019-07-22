@@ -1,11 +1,11 @@
 version: ci-{build}
-os: Visual Studio 2017
+os: Visual Studio 2019
 
 configuration:
   - Release
 
 before_build:
-  - premake5 vs2017
+  - premake5 vs2019
 
 clone_depth: 1
 
@@ -30,13 +30,13 @@ artifacts:
   - path: Bin/Release/$(NAME)
     name: "ml_pathfind"
 
-deploy:
-  description: 'Pathfind module release'
-  provider: GitHub
-  auth_token:
-    secure: gUShV8myZZHnM6U/HmGkJmtKslpUMglLZoeMPTyMbwNBNskDk0wQ/1HRMoYakQ7A
-  artifact: "ml_pathfind"
-  draft: false
-  prerelease: false
-  on:
-    appveyor_repo_tag: true
+# deploy:
+#   description: 'Pathfind module release'
+#   provider: GitHub
+#   auth_token:
+#     secure: gUShV8myZZHnM6U/HmGkJmtKslpUMglLZoeMPTyMbwNBNskDk0wQ/1HRMoYakQ7A
+#   artifact: "ml_pathfind"
+#   draft: false
+#   prerelease: false
+#   on:
+#     appveyor_repo_tag: true
