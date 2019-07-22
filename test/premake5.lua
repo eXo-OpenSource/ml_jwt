@@ -22,3 +22,6 @@ project "test"
 	
 	filter { "system:windows", "platforms:x64" }
 		links { "libcrypto_64.lib" }
+
+	filter "system:linux"
+		links { "ssl", "crypto" }

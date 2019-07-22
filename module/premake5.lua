@@ -26,5 +26,8 @@ project "module"
 		links { "lua5.1_64.lib" }
 		links { "libcrypto_64.lib" }
 
+	filter "system:linux"
+		links { "ssl", "crypto" }
+
 	filter "system:not linux"
 		excludes { "luaimports/luaimports.linux.h", "luaimports/luaimports.linux.cpp" }
