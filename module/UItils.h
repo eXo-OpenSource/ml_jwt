@@ -18,10 +18,9 @@ public:
 			if (lua_type(lua_vm, -1) != LUA_TSTRING || lua_type(lua_vm, -2) != LUA_TSTRING)
 			{
 				stringstream ss;
-				ss << "Bad Argument @ parse_named_table. Got invalid table entry, expected key(string) and value(string), but was key(" << lua_typename(lua_vm, lua_type(lua_vm, -2)) << ") and value(" << lua_typename(lua_vm, lua_type(lua_vm, -1)) << "). Skipping...";
-				pModuleManager->ErrorPrintf(ss.str().c_str());
-				lua_error(lua_vm);
-				break;
+				ss << "Bad Argument @ parse_named_table. Got invalid table entry, expected key(string) and value(string), but was key(" << lua_typename(lua_vm, lua_type(lua_vm, -2)) << ") and value(" << lua_typename(lua_vm, lua_type(lua_vm, -1)) << ").";
+				luaL_error(lua_vm, ss.str().c_str());
+				return {};
 			}
 
 			result[lua_tostring(lua_vm, -2)] = lua_tostring(lua_vm, -1);
