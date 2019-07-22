@@ -2,6 +2,14 @@ jobs:
 - job: windows
   pool:
     vmImage: 'windows-2019'
+
+  strategy:
+    maxParrallel: 2
+    matrix:
+      win32Job:
+        platform: 'x86'
+      win64Job:
+        platform: 'x64'
   variables:
     solution: 'Build/JWT.sln'
     buildConfiguration: 'Release'
@@ -9,13 +17,7 @@ jobs:
   - script: utils\premake5 vs2019
     displayName: 'Create Visual Studio 2019 Solution'
   - task: VSBuild@1
-    displayName: 'VSBuild - x86'
     inputs:
       solution: '$(solution)'
       configuration: '$(buildConfiguration)'
-  - task: VSBuild@1
-    displayName: 'VSBuild - x64'
-    inputs:
-      solution: '$(solution)'
-      configuration: '$(buildConfiguration)'
-      msbuildArchitecture: 'x64'
+      platform: '$(platform)'
