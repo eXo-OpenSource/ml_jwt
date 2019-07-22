@@ -4,7 +4,6 @@ solution "JWT"
 	startproject "test"
 	targetdir "Bin/%{cfg.buildcfg}"
 
-	-- flags { "C++14" }
 	platforms { "x86", "x64" }
 	pic "On"
 	symbols "On"

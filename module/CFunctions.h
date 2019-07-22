@@ -16,8 +16,8 @@ public:
 		return 1;
 	}
 
-	static int VerifyJWTToken(lua_State* luaVM);
-	static int SignJWTToken(lua_State* luaVM);
+	static int VerifyJWTToken(lua_State* lua_vm);
+	static int SignJWTToken(lua_State* lua_vm);
 
 	/*
 	static int LoadPathGraph(lua_State* luaVM);

@@ -25,6 +25,7 @@ project "module"
 		
 	filter { "system:windows", "platforms:x64" }
 		links { "lua5.1_64.lib" }
+		links { "libcrypto.64.lib" }
 
 	filter "system:not linux"
 		excludes { "luaimports/luaimports.linux.h", "luaimports/luaimports.linux.cpp" }

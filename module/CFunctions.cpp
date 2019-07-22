@@ -3,37 +3,73 @@
 #include "extra/CLuaArguments.h"
 
 #include "Module.h"
+#include <jwt-cpp/jwt.h>
+#include <sstream>
 
 #ifndef _WIN32
 	#include <sys/stat.h>
 #endif
 
-int CFunctions::SignJWTToken(lua_State* luaVM)
+int CFunctions::SignJWTToken(lua_State* lua_vm)
 {
 	// string jwtSign(string payload, string algorithm, string secret)
-	if (lua_type(luaVM, 1) != LUA_TSTRING || lua_type(luaVM, 2) != LUA_TSTRING || lua_type(luaVM, 3) != LUA_TSTRING)
+	if (lua_type(lua_vm, 1) != LUA_TSTRING || lua_type(lua_vm, 2) != LUA_TSTRING || lua_type(lua_vm, 3) != LUA_TSTRING)
 	{
 		pModuleManager->ErrorPrintf("Bad argument @ jwtSign\n");
-		lua_pushboolean(luaVM, false);
+		lua_pushboolean(lua_vm, false);
 		return 1;
 	}
 
-	lua_pushstring(luaVM, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c");
+	const auto payload		= lua_tostring(lua_vm, 1);
+	const auto algorithm	= lua_tostring(lua_vm, 2);
+	const auto secret		= lua_tostring(lua_vm, 3);
+
+	const auto jwt = jwt::create()
+		.set_issued_at(std::chrono::system_clock::now())
+		.sign(jwt::algorithm::hs256{ secret });
+
+	lua_pushstring(lua_vm, jwt.c_str());
 	return 1;
 }
 
-int CFunctions::VerifyJWTToken(lua_State* luaVM)
+int CFunctions::VerifyJWTToken(lua_State* lua_vm)
 {
 	// bool jwtVerify(string token, string algorithm, string secret)
-	if (lua_type(luaVM, 1) != LUA_TSTRING || lua_type(luaVM, 2) != LUA_TSTRING || lua_type(luaVM, 3) != LUA_TSTRING)
+	if (lua_type(lua_vm, 1) != LUA_TSTRING || lua_type(lua_vm, 2) != LUA_TSTRING || lua_type(lua_vm, 3) != LUA_TSTRING)
 	{
 		pModuleManager->ErrorPrintf("Bad argument @ jwtVerify\n");
-		lua_pushboolean(luaVM, false);
+		lua_pushboolean(lua_vm, false);
 		return 1;
 	}
 
-	lua_pushboolean(luaVM, false);
-	return 1;
+	const auto token		= lua_tostring(lua_vm, 1);
+	const auto algorithm	= lua_tostring(lua_vm, 2);
+	const auto secret		= lua_tostring(lua_vm, 3);
+
+	try {
+		const auto decoded_jwt = jwt::decode(token);
+		const auto verifier = jwt::verify()
+			.allow_algorithm(jwt::algorithm::hs256{ secret });
+
+		verifier.verify(decoded_jwt);
+
+		for(auto& e : decoded_jwt.get_payload_claims()) {
+			std::stringstream ss;
+			ss << e.first << " = " << e.second.to_json() << std::endl;
+			pModuleManager->DebugPrintf(lua_vm, ss.str().c_str());
+		}
+
+		lua_pushboolean(lua_vm, true);
+		return 1;
+	} catch (exception& e)
+	{
+		std::stringstream ss;
+		ss << "Bad Argument @ jwtVerify, " << e.what();
+		pModuleManager->DebugPrintf(lua_vm, ss.str().c_str());
+
+		lua_pushboolean(lua_vm, false);
+		return 1;
+	}
 }
 
 /*
