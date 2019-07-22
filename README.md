@@ -23,7 +23,7 @@ Returns the __jwt token__ if everything went fine, __false__ otherwise.
 
 ### Function: `jwtVerify`
 ```cpp
-bool jwtSign(string token, string algorithm, string secret)
+bool jwtVerify(string token, string algorithm, string secret)
 ```
 * __token:__ Lorem ipsum
 * __algorithm:__ Lorem ipsum
@@ -33,7 +33,7 @@ Returns __true__ if the jwt was successfully verified, __false__ otherwise.
 
 ### Function: `jwtGetClaims`
 ```cpp
-table jwtSign(string token)
+table jwtGetClaims(string token)
 ```
 * __token:__ Lorem ipsum
 
