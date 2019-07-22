@@ -7,7 +7,7 @@ Module* g_Module = nullptr;
 
 constexpr std::size_t kNumWorkers = 2;
 
-Module::Module(ILuaModuleManager* manager) : _moduleManager(manager) //, _jobManager(kNumWorkers)
+Module::Module(ILuaModuleManager* manager) : _moduleManager(manager), _jobManager(kNumWorkers)
 {
 }
 

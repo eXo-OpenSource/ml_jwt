@@ -8,14 +8,6 @@
 	#include <sys/stat.h>
 #endif
 
-int CFunctions::Test(lua_State* luaVM)
-{
-	pModuleManager->DebugPrintf(luaVM, "Module works! JWT ASDOIKFHÜSPAO!");
-	lua_pushstring(luaVM, "FUCK YOU!");
-	lua_pushboolean(luaVM, false);
-	return 2;
-}
-
 int CFunctions::SignJWTToken(lua_State* luaVM)
 {
 	// string jwtSign(string payload, string algorithm, string secret)

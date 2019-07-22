@@ -3,6 +3,7 @@
 #include "include/ILuaModuleManager.h"
 #include <cstring>
 #include "Module.h"
+#include <cassert>
 
 #ifndef WIN32
 	#include "luaimports/luaimports.linux.h"
@@ -10,7 +11,7 @@
 
 ILuaModuleManager10* pModuleManager = nullptr;
 
-// Initialisation function (module entrypoint)
+// Initialization function (module entrypoint)
 MTAEXPORT bool InitModule(ILuaModuleManager10* pManager, char* szModuleName, char* szAuthor, float* fVersion)
 {
 #ifndef WIN32
@@ -20,8 +21,10 @@ MTAEXPORT bool InitModule(ILuaModuleManager10* pManager, char* szModuleName, cha
     pModuleManager = pManager;
 
 	// Set the module info
-	std::memcpy(szModuleName, "JWT Module", MAX_INFO_LENGTH);
-	std::memcpy(szAuthor, "StiviK", MAX_INFO_LENGTH);
+    const auto module_name	= "JWT Module";
+    const auto author		= "StiviK";
+	std::memcpy(szModuleName, module_name,	MAX_INFO_LENGTH);
+	std::memcpy(szAuthor,     author,		MAX_INFO_LENGTH);
 	*fVersion = 1.0f;
 	
 	// Load module
@@ -36,13 +39,13 @@ MTAEXPORT void RegisterFunctions(lua_State* luaVM)
 	if (!pModuleManager || !luaVM)
 		return;
 
-	// Add lua vm to states list (to check validility)
+	// Add lua vm to states list (to check validity)
 	g_Module->AddLuaVM(luaVM);
 
 	// Register functions
-	pModuleManager->RegisterFunction(luaVM, "jwtTest", &CFunctions::Test);
-	pModuleManager->RegisterFunction(luaVM, "jwtSign", &CFunctions::SignJWTToken);
-	pModuleManager->RegisterFunction(luaVM, "jwtVerify", &CFunctions::VerifyJWTToken);
+	pModuleManager->RegisterFunction(luaVM, "jwtTest",		&CFunctions::Test);
+	pModuleManager->RegisterFunction(luaVM, "jwtSign",		&CFunctions::SignJWTToken);
+	pModuleManager->RegisterFunction(luaVM, "jwtVerify",	&CFunctions::VerifyJWTToken);
 }
 
 MTAEXPORT bool DoPulse()
