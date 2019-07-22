@@ -8,7 +8,7 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
           packages:
-            - g++-5
+            - g++-8
       env: 
         ENV_CXX=g++-8
         ENV_CC=gcc-8
