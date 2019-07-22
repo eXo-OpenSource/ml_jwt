@@ -65,7 +65,7 @@ int CFunctions::VerifyJWTToken(lua_State* lua_vm)
 	{
 		std::stringstream ss;
 		ss << "Bad Argument @ jwtVerify, " << e.what();
-		pModuleManager->DebugPrintf(lua_vm, ss.str().c_str());
+		pModuleManager->ErrorPrintf(ss.str().c_str());
 
 		lua_pushboolean(lua_vm, false);
 		return 1;

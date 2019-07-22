@@ -2,7 +2,7 @@ project "test"
 	language "C++"
 	kind "ConsoleApp"
 
-	-- links { "pathfind" }
+	libdirs { "lib" }
 
 	vpaths {
 		["Headers/*"] = "**.h",
@@ -16,3 +16,9 @@ project "test"
 		"**.cpp",
 		"**.h",
 	}
+
+	filter { "system:windows", "platforms:x86" }
+		links { "libcrypto.lib" }
+	
+	filter { "system:windows", "platforms:x64" }
+		links { "libcrypto_64.lib" }
