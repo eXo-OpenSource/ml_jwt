@@ -1,35 +1,28 @@
 language: cpp
-
 matrix:
   include:
-    - compiler: gcc
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - g++-8
-      env: 
-        ENV_CXX=g++-8
-        ENV_CC=gcc-8
-
+  - compiler: gcc
+    addons:
+      apt:
+        sources:
+        - ubuntu-toolchain-r-test
+        packages:
+        - g++-8
+    env: ENV_CXX=g++-8 ENV_CC=gcc-8
 before_script:
-  - wget https://github.com/sbx320/premake5-travis/blob/master/premake5?raw=true -O ./premake5 &&
-    chmod +x ./premake5 &&
-    ./premake5 gmake && 
-    cd Build
-
+- wget https://github.com/sbx320/premake5-travis/blob/master/premake5?raw=true -O
+  ./premake5 && chmod +x ./premake5 && ./premake5 gmake && cd Build
 script:
-  - make -j 3 CXX=$ENV_CXX CC=$ENV_CC config=release_x64
-  - cd ..
-  - mv Bin/Release/libml_jwt.so Bin/Release/ml_jwt.so
+- make -j 3 CXX=$ENV_CXX CC=$ENV_CC config=release_x64
+- cd ..
+- mv Bin/Release/libml_jwt.so Bin/Release/ml_jwt.so
 
-# deploy:
-#   skip_cleanup: true
-#   provider: releases
-#   api_key:
-#     secure: HdNy5XN+W0ouqJSDTm2swWKFvrfd9i0s0JSI+dKEqF4zKYl1n28tgeVYK0Ch0bqMNfht75uB7QNKaHtvkYUmeiIusLUsm1dNVX/wIrFeT5vC+1IXzZhi7ymbat75e19ysDVvOrvbpKkWGljv1kiPINuSsWCqRF9VUl8l92hAYO49Kn1W6lhW3DoYhYAEL/DU1N8VnBNol1xO1V/cBMIjVeDNi8fgiYy+rx7fZcQ9cu59MaAZhT4CYbriRq/mzAeMxA5ndO44MaIfhfLg1Mkpok8uNDdXLiVB04MsvrrHUenH/USQdAfSSGo28eZYecfI2ipTt1n4jtt3Ca/Tdi6bvUEQytXiB2qEd285o1ROcioxqvwCQVuc+fj7iI7C5P2HM3SJw/P0WTrg/53aC0QdLaGqLeRNzYU3FZgSwADVXApna8ZbMsxIIZfWKH+TSKakS5M4rC5STZJq6CaCmQ6zyZZyNyAJr6ZZ3mLsDfXrwvMzkEGoWTxAJ+jOF89GBCIfsM7Yd10mTyYZOA0GHFdAXOA73ZMxhSGtefWrALXudu6YbDv4TX78/5eEv27tGrDG3t++BRHOM7j+MhzZHleWyMWdXBPENJCCOMYrqkuP1ldg/ZwDztu3uJQ/vz8rYtADVqM7zbsmoDlq2oH5TSiEx2iDJ63+lnpCBDR4WbQFwGU=
-#   file: Bin/Release/ml_jwt.so
-#   on:
-#     repo: eXo-MTA/ml_jwt
-#     tags: true
+deploy:
+  skip_cleanup: true
+  provider: releases
+  api_key:
+    secure: ReOy6mA5VqtgDEd+f4tQtNk+3to5bn33mP+AFBHoljcz1JgQ7fCRe4raIGJFPrGxWET37P1vMMIrUc1K0rfmdULELj5VQ0NfmkSiIfFdw+HdQKA5PNVKf1t4zB6PA7nNO+c2N9U812AVqmFK9FJe4gn4W1Tf08zWY0aXD4EL45NEuS382em5ZT2KqWiTeAa1uMxYh8Ro0Ub5HRwX2QxlVromqtmay6h4vckdb+mXdXqOZol72ERe8BT1Oohi/JbCzZLp8kxfarFelaNqZRqdtSdXB90aWMmc4KH2GYKUiv3hic5ZbGxbdOctcaZAIg5KCpQzlnSQ4zrgbU/PxxxDndAEVxfWYSbqa9FtQHccgzBZBvzQn9t1dyI24lygsCk7F5H3Mkspl2BdiBR4XdGBuNaHAh+3xVNplEdfYa/hNeRncDTaW25HADzgUIOQ1eTVYL1eh2JM82KfHMYwGJsg0ZbJTLV7X/CZvzYYWJ9vV5DaIvJi1m2qsSmpbWnGfR5KRSRGYSKNpJlcbpRuIYbAHDwj8unN3wTESGrFX+M93g4Pu+dwV/DwqXv5DUl4Vamo1CaJ0Ly0IGoqP8wacCVseR1fyKGlTsgOfbRPTHfUxBOdlQjYLe44Mav9TLcWveGsNzRoYjgpCe5D3Yh/KTP6YFMzmm4lH7XfrpecEoeFHH8=
+  file: Bin/Release/ml_jwt.so
+  on:
+    repo: eXo-OpenSource/ml_jwt
+    tags: true
