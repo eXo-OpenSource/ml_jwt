@@ -1,0 +1,13 @@
+- job: windows
+  pool:
+    vmImage: 'windows-2019'
+  variables:
+    solution: 'Build/JWT.sln'
+    buildConfiguration: 'Release'
+  steps:
+  - script: utils\premake5 vs2019
+    displayName: 'Create Visual Studio 2019 Solution'
+  - task: VSBuild@1
+    inputs:
+      solution: '$(solution)'
+      configuration: '$(buildConfiguration)'
