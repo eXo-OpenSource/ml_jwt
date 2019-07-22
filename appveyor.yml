@@ -30,13 +30,13 @@ artifacts:
   - path: Bin/Release/$(NAME)
     name: "ml_jwt"
 
-# deploy:
-#   description: 'JWT module release'
-#   provider: GitHub
-#   auth_token:
-#     secure: gUShV8myZZHnM6U/HmGkJmtKslpUMglLZoeMPTyMbwNBNskDk0wQ/1HRMoYakQ7A
-#   artifact: "ml_jwt"
-#   draft: false
-#   prerelease: false
-#   on:
-#     appveyor_repo_tag: true
+deploy:
+  description: 'JWT module release'
+  provider: GitHub
+  auth_token:
+    secure: bhYIMQKXJT0gEFPHpjvyPfgrMU6czle+SUmAv0Wxlv4tBuas841j8qlkzSCmECCM
+  artifact: "ml_jwt"
+  draft: false
+  prerelease: false
+  on:
+    appveyor_repo_tag: true
