@@ -1,6 +1,5 @@
 # JWT Server Module for MTA:SA
-[![Build Status](https://img.shields.io/travis/com/eXo-OpenSource/ml_jwt/master.svg?style=flat-square&label=Linux:master)](https://travis-ci.com/eXo-OpenSource/ml_jwt)
-[![Build Status](https://img.shields.io/appveyor/ci/StiviiK/ml-jwt/master.svg?style=flat-square&label=Windows:master)](https://ci.appveyor.com/project/StiviiK/ml-jwt)
+[![Build Status](https://dev.azure.com/eXo-OpenSource/ml_jwt/_apis/build/status/eXo-OpenSource.ml_jwt?branchName=master)](https://dev.azure.com/eXo-OpenSource/ml_jwt/_build/latest?definitionId=1&branchName=master)
 ## Developing
 1. Download and install the EditorConfig plugin for Visual Studio: [https://github.com/editorconfig/editorconfig-visualstudio#readme](https://github.com/editorconfig/editorconfig-visualstudio#readme)
 2. Launch `premake.bat`
