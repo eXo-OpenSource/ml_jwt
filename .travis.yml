@@ -8,6 +8,8 @@ matrix:
         - ubuntu-toolchain-r-test
         packages:
         - g++-8
+        - libcrypto
+        - libssl-dev
     env: ENV_CXX=g++-8 ENV_CC=gcc-8
 before_script:
 - wget https://github.com/sbx320/premake5-travis/blob/master/premake5?raw=true -O
