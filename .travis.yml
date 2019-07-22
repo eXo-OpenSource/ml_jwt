@@ -8,7 +8,6 @@ matrix:
         - ubuntu-toolchain-r-test
         packages:
         - g++-8
-        - libcrypto
         - libssl-dev
     env: ENV_CXX=g++-8 ENV_CC=gcc-8
 before_script:
