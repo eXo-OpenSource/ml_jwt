@@ -5,17 +5,17 @@ jobs:
   variables:
     solution: 'Build/JWT.sln'
     buildConfiguration: 'Release'
-    buildConfiguration64: 'Release|x64'
   steps:
   - script: utils\premake5 vs2019
     displayName: 'Create Visual Studio 2019 Solution'
   - task: VSBuild@1
+    displayName: 'VSBuild - x86'
     inputs:
       solution: '$(solution)'
       configuration: '$(buildConfiguration)'
-      displayName: 'VSBuild - WIN32'
   - task: VSBuild@1
+    displayName: 'VSBuild - x64'
     inputs:
       solution: '$(solution)'
-      configuration: '$(buildConfiguration64)'
-      displayName: 'VSBuild - x64'
+      configuration: '$(buildConfiguration)'
+      msbuildArchitecture: 'x64'
