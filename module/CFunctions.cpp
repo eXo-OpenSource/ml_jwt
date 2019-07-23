@@ -33,6 +33,7 @@ int CFunctions::sign_jwt_token(lua_State* lua_vm)
 	const auto public_key_path  = lua_tostring(lua_vm, 4);
 	const auto private_key_path = lua_tostring(lua_vm, 5);
 
+	// Read public- and private key from files
 	std::string public_key = public_key_path, private_key;
 	if (lua_type(lua_vm, 5) != LUA_TNONE)
 	{
@@ -45,6 +46,7 @@ int CFunctions::sign_jwt_token(lua_State* lua_vm)
 		}
 	}
 
+	// Process signing
 	g_Module->GetJobManager().PushTask([/* lua_vm, */ claims, algorithm, public_key, private_key]()
 	{
 		const auto& now = std::chrono::system_clock::now();
@@ -110,12 +112,13 @@ int CFunctions::verify_jwt_token(lua_State* lua_vm)
 		return 1;
 	}
 
-
+	// Read arguments
 	const auto token            = lua_tostring(lua_vm, 1);
 	const auto algorithm        = lua_tostring(lua_vm, 2);
 	const auto public_key_path  = lua_tostring(lua_vm, 3);
 	const auto private_key_path = lua_tostring(lua_vm, 4);
 
+	// Read public- and private key from files
 	std::string public_key = public_key_path, private_key;
 	if (lua_type(lua_vm, 4) != LUA_TNONE)
 	{
@@ -128,6 +131,7 @@ int CFunctions::verify_jwt_token(lua_State* lua_vm)
 		}
 	}
 
+	// Process verification
 	try {
 		const auto decoded_jwt = jwt::decode(token);
 		auto verifier = jwt::verify();
@@ -166,8 +170,10 @@ int CFunctions::get_jwt_claims(lua_State* lua_vm)
 		return 1;
 	}
 
+	// Read arguments
 	const auto token = lua_tostring(lua_vm, 1);
 
+	// Process get claims
 	try
 	{
 		const auto decoded_jwt = jwt::decode(token);
