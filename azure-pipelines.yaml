@@ -20,7 +20,7 @@ stages:
       displayName: Install gcc
     - script: chmod +x utils/premake5-macos && utils/premake5-macos gmake
       displayName: 'Generate Makefile'
-    - script: cd Build && make -j 3 CXX=g++ CC=gcc config=release_x64
+    - script: cd Build && make -j 3 CXX=clang++ CC=gcc config=release_x64
       displayName: 'Build project'
     - script: mv $(Build.SourcesDirectory)/Bin/Release/libml_jwt.so $(Build.SourcesDirectory)/Bin/Release/ml_jwt_darwin.so
     - publish: '$(Build.SourcesDirectory)/Bin/Release/ml_jwt_darwin.so'
