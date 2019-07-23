@@ -28,17 +28,15 @@ int CFunctions::sign_jwt_token(lua_State* lua_vm)
 	const auto func_ref         = luaL_ref(lua_vm, LUA_REGISTRYINDEX);
 
 	// Read other arguments
-	const auto claims           = Utils::parse_named_table(lua_vm, 2);
-	const auto algorithm        = lua_tostring(lua_vm, 3);
-	const auto public_key_path  = lua_tostring(lua_vm, 4);
-	const auto private_key_path = lua_type(lua_vm, 5) != LUA_TNONE ? lua_tostring(lua_vm, 5) : "";
-	std::string public_key      = public_key_path, 
-				private_key     = private_key_path;
-
+	const auto claims                   = Utils::parse_named_table(lua_vm, 2);
+	const auto algorithm                = lua_tostring(lua_vm, 3);
+	const auto public_key_path          = lua_tostring(lua_vm, 4);
+	const auto private_key_path         = lua_tostring(lua_vm, 5);
+	std::string public_key, private_key = public_key_path;
+	
 	// Read public- and private key from files
 	if (lua_type(lua_vm, 5) != LUA_TNONE)
 	{
-		std::string pub_path;
 		if (!Crypto::read_key_pair(public_key_path, public_key, private_key_path, private_key))
 		{
 			pModuleManager->ErrorPrintf("Bad argument @ jwtSign\n");
@@ -118,7 +116,6 @@ int CFunctions::verify_jwt_token(lua_State* lua_vm)
 	const auto is_file_path     = lua_type(lua_vm, 3) != LUA_TNONE && lua_toboolean(lua_vm, 3);
 	if (is_file_path)
 	{
-		std::string pub_path;
 		if (!Crypto::read_key(public_key_path, public_key))
 		{
 			pModuleManager->ErrorPrintf("Bad argument @ jwtVerify\n");
