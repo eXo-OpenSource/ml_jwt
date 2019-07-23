@@ -12,17 +12,6 @@ stages:
     - script: mv $(Build.SourcesDirectory)/Bin/Release/libml_jwt.so $(Build.SourcesDirectory)/Bin/Release/ml_jwt.so
     - publish: '$(Build.SourcesDirectory)/Bin/Release/ml_jwt.so'
       artifact: 'ml_jwt_linux'
-  - job: macOS
-    pool:
-      vmImage: 'macOS-10.14'
-    steps:
-    - script: chmod +x utils/premake5-macos && utils/premake5-macos gmake
-      displayName: 'Generate Makefile'
-    - script: cd Build && make -j 3 CXX=g++-7 CC=gcc-7 config=release_x64
-      displayName: 'Build project'
-    - script: mv $(Build.SourcesDirectory)/Bin/Release/libml_jwt.so $(Build.SourcesDirectory)/Bin/Release/ml_jwt_darwin.so
-    - publish: '$(Build.SourcesDirectory)/Bin/Release/ml_jwt_darwin.so'
-      artifact: 'ml_jwt_darwin'
   - job: Windows
     pool:
       vmImage: 'windows-2019'
