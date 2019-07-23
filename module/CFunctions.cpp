@@ -31,7 +31,7 @@ int CFunctions::sign_jwt_token(lua_State* lua_vm)
 	const auto claims           = Utils::parse_named_table(lua_vm, 2);
 	const auto algorithm        = lua_tostring(lua_vm, 3);
 	const auto public_key_path  = lua_tostring(lua_vm, 4);
-	const auto private_key_path = lua_tostring(lua_vm, 5);
+	const auto private_key_path = lua_type(lua_vm, 5) != LUA_TNONE ? lua_tostring(lua_vm, 5) : "";
 	std::string public_key      = public_key_path, 
 				private_key     = private_key_path;
 
@@ -112,7 +112,7 @@ int CFunctions::verify_jwt_token(lua_State* lua_vm)
 	// Read arguments
 	const auto token            = lua_tostring(lua_vm, 1);
 	const auto public_key_path  = lua_tostring(lua_vm, 2);
-	std::string public_key = public_key_path;
+	std::string public_key      = public_key_path;
 
 	// Read public- and private key from files
 	const auto is_file_path     = lua_type(lua_vm, 3) != LUA_TNONE && lua_toboolean(lua_vm, 3);
