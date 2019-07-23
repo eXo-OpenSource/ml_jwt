@@ -9,20 +9,22 @@ int main(int argc, char* argv[])
 
 	auto begin = std::chrono::high_resolution_clock::now();
 	std::cout << "Testing JWT verify, wrong secret" << std::endl;
-	try
-	{
-		const auto verifier = jwt::verify()
-			.allow_algorithm(jwt::algorithm::hs256{ "a" });
+	//for (auto i = 0; i < 1000; i++) {
+		try
+		{
+			const auto verifier = jwt::verify()
+				.allow_algorithm(jwt::algorithm::hs256{ "a" });
 
-		verifier.verify(decoded_jwt);
+			verifier.verify(decoded_jwt);
 
-		std::cout << "\tNo Exception thrown." << std::endl;
-	} catch (std::exception& e)
-	{
-		std::cout << "\tException caught: " << e.what() << std::endl;
-	}
-	auto time = (std::chrono::high_resolution_clock::now() - begin) / std::chrono::milliseconds(1);
-	std::cout << "Took: " << time << "ms." << std::endl;
+			std::cout << "\tNo Exception thrown." << std::endl;
+		} catch (std::exception& e)
+		{
+			std::cout << "\tException caught: " << e.what() << std::endl;
+		}
+	//}
+	auto time = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - begin).count(); // / 1000;
+	std::cout << "Took: " << time << "ns." << std::endl;
 
 	begin = std::chrono::high_resolution_clock::now();
 	std::cout << "Testing JWT verify, correct secret" << std::endl;
@@ -38,8 +40,8 @@ int main(int argc, char* argv[])
 	{
 		std::cout << "\tException caught: " << e.what() << std::endl;
 	}
-	time = (std::chrono::high_resolution_clock::now() - begin) / std::chrono::milliseconds(1);
-	std::cout << "Took: " << time << "ms." << std::endl;
+	time = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - begin).count();
+	std::cout << "Took: " << time << "ns." << std::endl;
 
 	begin = std::chrono::high_resolution_clock::now();
 	std::cout << "Reading JWT claims" << std::endl;
@@ -54,8 +56,8 @@ int main(int argc, char* argv[])
 	{
 		std::cout << "\tException caught: " << e.what() << std::endl;
 	}
-	time = (std::chrono::high_resolution_clock::now() - begin) / std::chrono::milliseconds(1);
-	std::cout << "Took: " << time << "ms." << std::endl;
+	time = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - begin).count();
+	std::cout << "Took: " << time << "ns." << std::endl;
 
 	std::cin.get();
 	return 0;
