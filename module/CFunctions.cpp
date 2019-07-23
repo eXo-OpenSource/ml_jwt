@@ -48,28 +48,37 @@ int CFunctions::sign_jwt_token(lua_State* lua_vm)
 	// Process signing
 	g_Module->GetJobManager().PushTask([/* lua_vm, */ claims, algorithm, public_key, private_key]()
 	{
-		const auto& now = std::chrono::system_clock::now();
-		auto jwt = jwt::create()
-			.set_issued_at(now)
-			.set_not_before(now);
+		try {
+			const auto& now = std::chrono::system_clock::now();
+			auto jwt = jwt::create()
+				.set_issued_at(now)
+				.set_not_before(now);
 
-		// Add claims
-		for (const auto& pair : claims)
+			// Add claims
+			for (const auto& pair : claims)
+			{
+				jwt.set_payload_claim(pair.first, pair.second);
+			}
+
+			// sign the token
+			std::string token;
+			if (std::strcmp(algorithm, "HS256") == 0)
+				token = jwt.sign(jwt::algorithm::hs256{ public_key });
+			else if (std::strcmp(algorithm, "RS256") == 0) {
+				token = jwt.sign(jwt::algorithm::rs256{ public_key, private_key });
+			} else
+				//luaL_error(lua_vm, "Error @ jwtSign, invalid algorithm has been passed."); // Todo: find a way to call this without the mta server raising panic
+				pModuleManager->ErrorPrintf("Error @ jwtSign, invalid algorithm has been passed.");
+
+			return token;
+		} catch(exception& e)
 		{
-			jwt.set_payload_claim(pair.first, pair.second);
+			std::stringstream ss;
+			ss << "Bad Argument @ jwtVerify, " << e.what();
+			pModuleManager->ErrorPrintf(ss.str().c_str());
+
+			return std::string();
 		}
-
-		// sign the token
-		std::string token;
-		if (std::strcmp(algorithm, "HS256") == 0)
-			token = jwt.sign(jwt::algorithm::hs256{ public_key });
-		else if (std::strcmp(algorithm, "RS256") == 0)
-			token = jwt.sign(jwt::algorithm::rs256{ public_key, private_key });
-		else
-			//luaL_error(lua_vm, "Error @ jwtSign, invalid algorithm has been passed."); // Todo: find a way to call this without the mta server raising panic
-			pModuleManager->ErrorPrintf("Error @ jwtSign, invalid algorithm has been passed.");
-
-		return token;
 	}, [lua_vm = lua_getmainstate(lua_vm), func_ref](const std::string& token)
 	{
 		// Validate LuaVM (use ResourceStart/-Stop to manage valid lua states)
