@@ -37,7 +37,7 @@ int CFunctions::sign_jwt_token(lua_State* lua_vm)
 	if (lua_type(lua_vm, 5) != LUA_TNONE)
 	{
 		std::string pub_path;
-		if (!Crypto::read_key_pair(public_key_path, private_key_path, &public_key, &private_key))
+		if (!Crypto::read_key_pair(public_key_path, private_key_path, public_key, private_key))
 		{
 			pModuleManager->ErrorPrintf("Bad argument @ jwtSign\n");
 			lua_pushboolean(lua_vm, false);
@@ -120,7 +120,7 @@ int CFunctions::verify_jwt_token(lua_State* lua_vm)
 	if (lua_type(lua_vm, 4) != LUA_TNONE)
 	{
 		std::string pub_path;
-		if (!Crypto::read_key_pair(public_key_path, private_key_path, &public_key, &private_key))
+		if (!Crypto::read_key_pair(public_key_path, private_key_path, public_key, private_key))
 		{
 			pModuleManager->ErrorPrintf("Bad argument @ jwtVerify\n");
 			lua_pushboolean(lua_vm, false);
