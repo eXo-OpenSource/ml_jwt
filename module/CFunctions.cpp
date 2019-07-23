@@ -64,9 +64,9 @@ int CFunctions::sign_jwt_token(lua_State* lua_vm)
 			std::string token;
 			if (std::strcmp(algorithm, "HS256") == 0)
 				token = jwt.sign(jwt::algorithm::hs256{ public_key });
-			else if (std::strcmp(algorithm, "RS256") == 0) {
+			else if (std::strcmp(algorithm, "RS256") == 0)
 				token = jwt.sign(jwt::algorithm::rs256{ public_key, private_key });
-			} else
+			else
 				//luaL_error(lua_vm, "Error @ jwtSign, invalid algorithm has been passed."); // Todo: find a way to call this without the mta server raising panic
 				pModuleManager->ErrorPrintf("Error @ jwtSign, invalid algorithm has been passed.");
 
