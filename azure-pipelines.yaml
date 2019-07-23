@@ -16,7 +16,7 @@ stages:
     pool:
       vmImage: 'macOS-10.14'
     steps:
-    - script: chmod +x utils/premake5 && utils/premake5 gmake
+    - script: chmod +x utils/premake5-macos && utils/premake5-macos gmake
       displayName: 'Generate Makefile'
     - script: cd Build && make -j 3 CXX=g++-7 CC=gcc-7 config=release_x64
       displayName: 'Build project'
