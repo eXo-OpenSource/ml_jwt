@@ -63,16 +63,12 @@ int CFunctions::sign_jwt_token(lua_State* lua_vm)
 		// sign the token
 		std::string token;
 		if (std::strcmp(algorithm, "HS256") == 0)
-		{
 			token = jwt.sign(jwt::algorithm::hs256{ public_key });
-		} else if (std::strcmp(algorithm, "RS256") == 0)
-		{
+		else if (std::strcmp(algorithm, "RS256") == 0)
 			token = jwt.sign(jwt::algorithm::rs256{ public_key, private_key });
-		} else
-		{
+		else
 			//luaL_error(lua_vm, "Error @ jwtSign, invalid algorithm has been passed."); // Todo: find a way to call this without the mta server raising panic
 			pModuleManager->ErrorPrintf("Error @ jwtSign, invalid algorithm has been passed.");
-		}
 
 		return token;
 	}, [lua_vm = lua_getmainstate(lua_vm), func_ref](const std::string& token)
@@ -133,13 +129,13 @@ int CFunctions::verify_jwt_token(lua_State* lua_vm)
 	// Process verification
 	try {
 		const auto decoded_jwt = jwt::decode(token);
-		const auto jwt_algorithm = decoded_jwt.get_algorithm().c_str();
+		const auto algorithm = decoded_jwt.get_algorithm().c_str();
 		auto verifier = jwt::verify();
 
 		// set verifier algorithm
-		if (std::strcmp(jwt_algorithm, "hs256") != 0)
+		if (std::strcmp(algorithm, "HS256") == 0)
 			verifier.allow_algorithm(jwt::algorithm::hs256{ public_key });
-		else if (std::strcmp(jwt_algorithm, "rs256") != 0)
+		else if (std::strcmp(algorithm, "RS256") == 0)
 			verifier.allow_algorithm(jwt::algorithm::rs256{ public_key });
 
 		verifier.verify(decoded_jwt);
