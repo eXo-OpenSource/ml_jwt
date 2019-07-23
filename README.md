@@ -13,8 +13,9 @@
 ## API
 ### Function: `jwtSign`
 ```cpp
-string jwtSign(table claims, string algorithm, string secret)
+string jwtSign(function(string/boolean) callback, table claims, string algorithm, string secret)
 ```
+* __callback:__ Lorem ipsum
 * __claims:__ Lorem ipsum
 * __algorithm:__ Lorem ipsum
 * __secret__ Lorem ipsum

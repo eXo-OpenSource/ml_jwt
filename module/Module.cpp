@@ -14,17 +14,17 @@ Module::Module(ILuaModuleManager* manager) : _moduleManager(manager), _jobManage
 Module::~Module()
 {
 	// Shutdown job manager threads
-	//_jobManager.Stop();
+	_jobManager.Stop();
 }
 
 void Module::Start()
 {
 	// Start job manager worker threads
-	//_jobManager.Start();
+	_jobManager.Start();
 }
 
 void Module::Process()
 {
 	// Call complete callbacks on main thread
-	//_jobManager.SpreadResults();
+	_jobManager.SpreadResults();
 }
