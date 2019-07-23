@@ -10,6 +10,10 @@
 2. Add `<module src="ml_jwt.dll"/>` (or `.so` for Linux) to your `mtaserver.conf`.
 3. Start the server
 
+## Depdencies
+* libcrypto (openssl or compatible)
+* libssl-dev (for the header files)
+
 ## API
 ### Function: `jwtSign`
 ```cpp
