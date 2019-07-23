@@ -1,0 +1,1 @@
+https://github.com/Thalhammer/jwt-cpp/tree/master/include/jwt-cpp
