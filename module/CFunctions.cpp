@@ -13,7 +13,7 @@
 
 int CFunctions::sign_jwt_token(lua_State* lua_vm)
 {
-	// bool jwtSign(function(string) callback, table claims, string algorithm, string secret/publicKeyPath, string? privateKey)
+	// bool jwtSign(function(string/boolean) callback, table claims, string algorithm, string secret/public_key_path, string private_key_path)
 	if (lua_type(lua_vm, 1) != LUA_TFUNCTION || lua_type(lua_vm, 2) != LUA_TTABLE || lua_type(lua_vm, 3) != LUA_TSTRING || lua_type(lua_vm, 4) != LUA_TSTRING || 
 		(lua_type(lua_vm, 5) != LUA_TNONE && lua_type(lua_vm, 5) != LUA_TSTRING))
 	{
@@ -38,7 +38,7 @@ int CFunctions::sign_jwt_token(lua_State* lua_vm)
 	if (lua_type(lua_vm, 5) != LUA_TNONE)
 	{
 		std::string pub_path;
-		if (!Crypto::read_key_pair(public_key_path, private_key_path, public_key, private_key))
+		if (!Crypto::read_key_pair(public_key_path, public_key, private_key_path, private_key))
 		{
 			pModuleManager->ErrorPrintf("Bad argument @ jwtSign\n");
 			lua_pushboolean(lua_vm, false);
@@ -62,10 +62,10 @@ int CFunctions::sign_jwt_token(lua_State* lua_vm)
 
 		// sign the token
 		std::string token;
-		if (std::strcmp(algorithm, "HS265") == 0)
+		if (std::strcmp(algorithm, "HS256") == 0)
 		{
 			token = jwt.sign(jwt::algorithm::hs256{ public_key });
-		} else if (std::strcmp(algorithm, "RS265") == 0)
+		} else if (std::strcmp(algorithm, "RS256") == 0)
 		{
 			token = jwt.sign(jwt::algorithm::rs256{ public_key, private_key });
 		} else
@@ -103,9 +103,9 @@ int CFunctions::sign_jwt_token(lua_State* lua_vm)
 
 int CFunctions::verify_jwt_token(lua_State* lua_vm)
 {
-	// bool jwtVerify(string token, string algorithm, string secret/publicKeyPath, string? privateKey)
-	if (lua_type(lua_vm, 1) != LUA_TSTRING || lua_type(lua_vm, 2) != LUA_TSTRING || lua_type(lua_vm, 3) != LUA_TSTRING ||
-		(lua_type(lua_vm, 4) != LUA_TNONE && lua_type(lua_vm, 4) != LUA_TSTRING))
+	// bool jwtVerify(string token, string secret/public_key_path, bool is_file_path = false)
+	if (lua_type(lua_vm, 1) != LUA_TSTRING || lua_type(lua_vm, 2) != LUA_TSTRING ||
+		(lua_type(lua_vm, 3) != LUA_TNONE && lua_type(lua_vm, 3) != LUA_TBOOLEAN))
 	{
 		pModuleManager->ErrorPrintf("Bad argument @ jwtVerify\n");
 		lua_pushboolean(lua_vm, false);
@@ -114,16 +114,15 @@ int CFunctions::verify_jwt_token(lua_State* lua_vm)
 
 	// Read arguments
 	const auto token            = lua_tostring(lua_vm, 1);
-	const auto algorithm        = lua_tostring(lua_vm, 2);
-	const auto public_key_path  = lua_tostring(lua_vm, 3);
-	const auto private_key_path = lua_tostring(lua_vm, 4);
+	const auto public_key_path  = lua_tostring(lua_vm, 2);
+	const auto is_file_path     = lua_type(lua_vm, 3) != LUA_TNONE && lua_toboolean(lua_vm, 3);
 
 	// Read public- and private key from files
-	std::string public_key = public_key_path, private_key;
-	if (lua_type(lua_vm, 4) != LUA_TNONE)
+	std::string public_key = public_key_path;
+	if (is_file_path)
 	{
 		std::string pub_path;
-		if (!Crypto::read_key_pair(public_key_path, private_key_path, public_key, private_key))
+		if (!Crypto::read_key(public_key_path, public_key))
 		{
 			pModuleManager->ErrorPrintf("Bad argument @ jwtVerify\n");
 			lua_pushboolean(lua_vm, false);
@@ -134,16 +133,14 @@ int CFunctions::verify_jwt_token(lua_State* lua_vm)
 	// Process verification
 	try {
 		const auto decoded_jwt = jwt::decode(token);
+		const auto jwt_algorithm = decoded_jwt.get_algorithm().c_str();
 		auto verifier = jwt::verify();
 
 		// set verifier algorithm
-		if (std::strcmp(algorithm, "HS265") != 0)
-		{
+		if (std::strcmp(jwt_algorithm, "hs256") != 0)
 			verifier.allow_algorithm(jwt::algorithm::hs256{ public_key });
-		} else if (std::strcmp(algorithm, "RS265") != 0)
-		{
-			verifier.allow_algorithm(jwt::algorithm::rs256{ public_key, private_key });
-		}
+		else if (std::strcmp(jwt_algorithm, "rs256") != 0)
+			verifier.allow_algorithm(jwt::algorithm::rs256{ public_key });
 
 		verifier.verify(decoded_jwt);
 

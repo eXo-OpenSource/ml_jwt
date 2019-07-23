@@ -5,13 +5,22 @@
 bool Crypto::read_key(const std::string& key_path, std::string& key)
 {
 	std::ifstream in(key_path);
+	if (!in.good())
+	{
+		return false;
+	}
+
 	const std::string result{std::istreambuf_iterator<char>(in), std::istreambuf_iterator<char>()};
+	if (result.empty())
+	{
+		return false;
+	}
 
 	key.assign(result);
 	return true;
 }
 
-bool Crypto::read_key_pair(const std::string& public_key_path, const std::string& private_key_path, std::string& public_key, std::string& private_key)
+bool Crypto::read_key_pair(const std::string& public_key_path, std::string& public_key, const std::string& private_key_path, std::string& private_key)
 {
 	return read_key(public_key_path, public_key) && read_key(private_key_path, private_key);
 }
