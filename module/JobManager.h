@@ -76,13 +76,12 @@ public:
 	void SpreadResults()
 	{
 		std::lock_guard<std::mutex> lock{ _mutex };
-
 		if (_completedTasks.empty())
 			return;
 
-		for (auto& task : _completedTasks)
+		for (auto& [result, callback] : _completedTasks)
 		{
-			task.second(task.first);
+			callback(result);
 		}
 
 		_completedTasks.clear();
