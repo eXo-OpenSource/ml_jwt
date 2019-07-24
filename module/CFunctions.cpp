@@ -47,7 +47,7 @@ int CFunctions::sign_jwt_token(lua_State* lua_vm)
 	}
 
 	// Process signing
-	g_Module->GetJobManager().PushTask([/* lua_vm, */ claims, algorithm, public_key, private_key]()
+	g_Module->GetJobManager().PushTask([/* lua_vm, */ claims, algorithm, public_key, private_key]() -> const std::optional<std::any>
 	{
 		try {
 			const auto& now = std::chrono::system_clock::now();
@@ -77,9 +77,9 @@ int CFunctions::sign_jwt_token(lua_State* lua_vm)
 			ss << "Bad Argument @ jwtSign, " << e.what();
 			pModuleManager->ErrorPrintf(ss.str().c_str());
 
-			return std::string();
+			return {};
 		}
-	}, [lua_vm = lua_getmainstate(lua_vm), func_ref](const std::any& result)
+	}, [lua_vm = lua_getmainstate(lua_vm), func_ref](const std::optional<std::any>& result)
 	{
 		// Validate LuaVM (use ResourceStart/-Stop to manage valid lua states)
 		if (!g_Module->HasLuaVM(lua_vm))
@@ -90,12 +90,14 @@ int CFunctions::sign_jwt_token(lua_State* lua_vm)
 
 		// Push token
 		try {
-			const auto token = std::any_cast<std::string>(result); // might throw bad_any_cast
-			if (token.length() > 0) {
+			if (result.has_value()) {
+				const auto token = std::any_cast<std::string>(result.value()); // might throw bad_any_cast
 				lua_pushstring(lua_vm, token.c_str());
-			} else {
+			} else
+			{
 				lua_pushboolean(lua_vm, false);
 			}
+
 		} catch (exception& e)
 		{
 			lua_pushboolean(lua_vm, false);
