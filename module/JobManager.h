@@ -60,16 +60,16 @@ public:
 			}
 
 			// Get next task
-			std::pair<Task, TaskCompleteCallback> task = _tasks.front();
+			auto& [task, completed_callback] = _tasks.front();
 			_tasks.pop();
 			_mutex.unlock();
 
 			// Run task
-			TaskResult result = task.first();
+			TaskResult result = task();
 
 			// Put result into completed tasks list
 			std::lock_guard<std::mutex> lock{ _mutex };
-			_completedTasks.push_back({ result, task.second });
+			_completedTasks.push_back({ result, completed_callback });
 		}
 	}
 
