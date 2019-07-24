@@ -32,8 +32,8 @@ int CFunctions::sign_jwt_token(lua_State* lua_vm)
 	const auto algorithm        = lua_tostring(lua_vm, 3);
 	const auto public_key_path  = lua_tostring(lua_vm, 4);
 	const auto private_key_path = lua_tostring(lua_vm, 5);
-	std::string public_key      = public_key_path,				
-				private_key;
+	std::string public_key      = public_key_path,
+                private_key;
 	
 	// Read public- and private key from files
 	if (lua_type(lua_vm, 5) != LUA_TNONE)
@@ -68,19 +68,18 @@ int CFunctions::sign_jwt_token(lua_State* lua_vm)
 			else if (std::strcmp(algorithm, "RS256") == 0)
 				token = jwt.sign(jwt::algorithm::rs256{ public_key, private_key });
 			else
-				//luaL_error(lua_vm, "Error @ jwtSign, invalid algorithm has been passed."); // Todo: find a way to call this without the mta server raising panic
 				pModuleManager->ErrorPrintf("Error @ jwtSign, invalid algorithm has been passed.");
 
 			return token;
 		} catch(exception& e)
 		{
 			std::stringstream ss;
-			ss << "Bad Argument @ jwtVerify, " << e.what();
+			ss << "Bad Argument @ jwtSign, " << e.what();
 			pModuleManager->ErrorPrintf(ss.str().c_str());
 
 			return std::string();
 		}
-	}, [lua_vm = lua_getmainstate(lua_vm), func_ref](const std::string& token)
+	}, [lua_vm = lua_getmainstate(lua_vm), func_ref](const std::any& result)
 	{
 		// Validate LuaVM (use ResourceStart/-Stop to manage valid lua states)
 		if (!g_Module->HasLuaVM(lua_vm))
@@ -90,9 +89,15 @@ int CFunctions::sign_jwt_token(lua_State* lua_vm)
 		lua_rawgeti(lua_vm, LUA_REGISTRYINDEX, func_ref);
 
 		// Push token
-		if (token.length() > 0) {
-			lua_pushstring(lua_vm, token.c_str());
-		} else {
+		try {
+			const auto token = std::any_cast<std::string>(result); // might throw bad_any_cast
+			if (token.length() > 0) {
+				lua_pushstring(lua_vm, token.c_str());
+			} else {
+				throw exception();
+			}
+		} catch (exception& e)
+		{
 			lua_pushboolean(lua_vm, false);
 		}
 

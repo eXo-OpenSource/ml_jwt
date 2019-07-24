@@ -1,5 +1,6 @@
 #pragma once
 #include <unordered_set>
+#include <any>
 
 #include "JobManager.h"
 
@@ -19,11 +20,11 @@ public:
 	inline void RemoveLuaVM(lua_State* luaVM) { _luaStates.erase(luaVM); }
 	inline bool HasLuaVM(lua_State* luaVM) { return _luaStates.find(luaVM) != _luaStates.end(); }
 
-	inline JobManager<const std::string>& GetJobManager() { return _jobManager; }
+	inline JobManager<const std::any>& GetJobManager() { return _jobManager; }
 
 private:
 	ILuaModuleManager* _moduleManager;
-	JobManager<const std::string> _jobManager;
+	JobManager<const std::any> _jobManager;
 	std::unordered_set<lua_State*> _luaStates;
 };
 
