@@ -94,7 +94,7 @@ int CFunctions::sign_jwt_token(lua_State* lua_vm)
 			if (token.length() > 0) {
 				lua_pushstring(lua_vm, token.c_str());
 			} else {
-				throw exception();
+				lua_pushboolean(lua_vm, false);
 			}
 		} catch (exception& e)
 		{
