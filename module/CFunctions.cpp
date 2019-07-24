@@ -62,15 +62,13 @@ int CFunctions::sign_jwt_token(lua_State* lua_vm)
 			}
 
 			// sign the token
-			std::string token;
 			if (std::strcmp(algorithm, "HS256") == 0)
-				token = jwt.sign(jwt::algorithm::hs256{ public_key });
-			else if (std::strcmp(algorithm, "RS256") == 0)
-				token = jwt.sign(jwt::algorithm::rs256{ public_key, private_key });
-			else
-				pModuleManager->ErrorPrintf("Error @ jwtSign, invalid algorithm has been passed.");
-
-			return token;
+				return jwt.sign(jwt::algorithm::hs256{ public_key });
+			if (std::strcmp(algorithm, "RS256") == 0)
+				return jwt.sign(jwt::algorithm::rs256{ public_key, private_key });
+			
+			pModuleManager->ErrorPrintf("Error @ jwtSign, invalid algorithm has been passed.");
+			return {};
 		} catch(exception& e)
 		{
 			std::stringstream ss;
