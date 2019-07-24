@@ -4,7 +4,7 @@
 #include "Module.h"
 #include <jwt-cpp/jwt.h>
 #include <sstream>
-#include "UItils.h"
+#include "Utils.h"
 #include "Crypto.h"
 
 #ifndef _WIN32
@@ -38,7 +38,7 @@ int CFunctions::sign_jwt_token(lua_State* lua_vm)
 	// Read public- and private key from files
 	if (lua_type(lua_vm, 5) != LUA_TNONE)
 	{
-		if (!Crypto::read_key_pair(public_key_path, public_key, private_key_path, private_key))
+		if (!Crypto::read_key_pair(lua_vm, public_key_path, public_key, private_key_path, private_key))
 		{
 			pModuleManager->ErrorPrintf("Bad argument @ jwtSign\n");
 			lua_pushboolean(lua_vm, false);
@@ -56,9 +56,9 @@ int CFunctions::sign_jwt_token(lua_State* lua_vm)
 				.set_not_before(now);
 
 			// Add claims
-			for (const auto& pair : claims)
+			for (const auto& [id, claim] : claims)
 			{
-				jwt.set_payload_claim(pair.first, pair.second);
+				jwt.set_payload_claim(id, claim);
 			}
 
 			// sign the token
@@ -131,7 +131,7 @@ int CFunctions::verify_jwt_token(lua_State* lua_vm)
 	const auto is_file_path     = lua_type(lua_vm, 3) != LUA_TNONE && lua_toboolean(lua_vm, 3);
 	if (is_file_path)
 	{
-		if (!Crypto::read_key(public_key_path, public_key))
+		if (!Crypto::read_key(lua_vm, public_key_path, public_key))
 		{
 			pModuleManager->ErrorPrintf("Bad argument @ jwtVerify\n");
 			lua_pushboolean(lua_vm, false);
