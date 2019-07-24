@@ -1,5 +1,6 @@
 # JWT Server Module for MTA:SA
 [![Build Status](https://dev.azure.com/eXo-OpenSource/ml_jwt/_apis/build/status/eXo-OpenSource.ml_jwt?branchName=master)](https://dev.azure.com/eXo-OpenSource/ml_jwt/_build/latest?definitionId=1&branchName=master)
+
 ## Developing
 1. Download and install the EditorConfig plugin for Visual Studio: [https://github.com/editorconfig/editorconfig-visualstudio#readme](https://github.com/editorconfig/editorconfig-visualstudio#readme)
 2. Launch `premake.bat`
@@ -44,6 +45,12 @@ table jwtGetClaims(string token)
 * __token:__ Lorem ipsum
 
 Returns a table __containing the claims__.
+
+## Download
+via https://github.com/Contextualist/glare
+* [Linux x64](https://glare.now.sh/eXo-OpenSource/ml_jwt/ml_jwt.so)
+* [Windows x64](https://glare.now.sh/eXo-OpenSource/ml_jwt/ml_jwt_x64.dll)
+* [Windows x86](https://glare.now.sh/eXo-OpenSource/ml_jwt/ml_jwt_win32.dll)
 
 ## Contributors
 * Stefan K.
