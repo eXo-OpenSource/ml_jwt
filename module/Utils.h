@@ -4,6 +4,7 @@
 #include <sstream>
 
 #include "ILuaModuleManager.h"
+#include "Build/BadArgument.h"
 
 class Utils
 {
@@ -18,9 +19,8 @@ public:
 			if (lua_type(lua_vm, -1) != LUA_TSTRING || lua_type(lua_vm, -2) != LUA_TSTRING)
 			{
 				stringstream ss;
-				ss << "Bad Argument @ parse_named_table. Got invalid table entry, expected key(string) and value(string), but was key(" << lua_typename(lua_vm, lua_type(lua_vm, -2)) << ") and value(" << lua_typename(lua_vm, lua_type(lua_vm, -1)) << ").";
-				luaL_error(lua_vm, ss.str().c_str());
-				return {};
+				ss << "got invalid table entry, expected key(string) and value(string), but was key(" << lua_typename(lua_vm, lua_type(lua_vm, -2)) << ") and value(" << lua_typename(lua_vm, lua_type(lua_vm, -1)) << ")";
+				throw runtime_error(ss.str());
 			}
 
 			result[lua_tostring(lua_vm, -2)] = lua_tostring(lua_vm, -1);
@@ -30,22 +30,21 @@ public:
 		return result;
 	}
 
-	static inline bool format_path(lua_State* lua_vm, const std::string& input_path, std::string& formatted_path)
+	static inline void format_path(lua_State* lua_vm, const std::string& input_path, std::string& formatted_path)
 	{
 		char buf[300];
 		if (!pModuleManager->GetResourceFilePath(lua_vm, input_path.c_str(), buf, sizeof(buf)))
 		{
-			return false;
+			throw runtime_error("file not found");
 		}
 
 		// Check if path is valid
 		const std::string path{ buf };
 		if (path.find("..") != std::string::npos)
 		{
-			return false;
+			throw runtime_error("invalid path");
 		}
 
 		formatted_path.assign(path);
-		return true;
 	}
 };

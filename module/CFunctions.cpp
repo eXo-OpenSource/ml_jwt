@@ -21,92 +21,96 @@ int CFunctions::sign_jwt_token(lua_State* lua_vm)
 		return 1;
 	}
 
-	// Save reference of the Lua callback function
-	// See: http://lua-users.org/lists/lua-l/2008-12/msg00193.html
-	lua_pushvalue(lua_vm, 1);
-	const auto func_ref         = luaL_ref(lua_vm, LUA_REGISTRYINDEX);
+	try {
+		// Save reference of the Lua callback function
+		// See: http://lua-users.org/lists/lua-l/2008-12/msg00193.html
+		lua_pushvalue(lua_vm, 1);
+		const auto func_ref         = luaL_ref(lua_vm, LUA_REGISTRYINDEX);
 
-	// Read other arguments
-	const auto claims           = Utils::parse_named_table(lua_vm, 2);
-	const auto algorithm        = lua_tostring(lua_vm, 3);
-	const auto public_key_path  = lua_tostring(lua_vm, 4);
-	const auto private_key_path = lua_tostring(lua_vm, 5);
-	std::string public_key      = public_key_path,
-                private_key;
-	
-	// Read public- and private key from files
-	if (lua_type(lua_vm, 5) != LUA_TNONE)
-	{
-		if (!Crypto::read_key_pair(lua_vm, public_key_path, public_key, private_key_path, private_key))
+		// Read other arguments
+		const auto claims           = Utils::parse_named_table(lua_vm, 2);
+		const auto algorithm        = lua_tostring(lua_vm, 3);
+		const auto public_key_path  = lua_tostring(lua_vm, 4);
+		const auto private_key_path = lua_tostring(lua_vm, 5);
+		std::string public_key      = public_key_path,
+	                private_key;
+		
+		// Read public- and private key from files
+		if (lua_type(lua_vm, 5) != LUA_TNONE)
 		{
-			pModuleManager->ErrorPrintf("Bad argument @ jwtSign\n");
-			lua_pushboolean(lua_vm, false);
-			return 1;
+			Crypto::read_key_pair(lua_vm, public_key_path, public_key, private_key_path, private_key);
 		}
-	}
 
-	// Process signing
-	g_Module->GetJobManager().PushTask([/* lua_vm, */ claims, algorithm, public_key, private_key]() -> const std::optional<std::any>
-	{
-		try {
-			const auto& now = std::chrono::system_clock::now();
-			auto jwt = jwt::create()
-				.set_issued_at(now)
-				.set_not_before(now);
+		// Process signing
+		g_Module->GetJobManager().PushTask([/* lua_vm, */ claims, algorithm, public_key, private_key]() -> const std::optional<std::any>
+		{
+			try {
+				const auto& now = std::chrono::system_clock::now();
+				auto jwt = jwt::create()
+					.set_issued_at(now)
+					.set_not_before(now);
 
-			// Add claims
-			for (const auto& [id, claim] : claims)
+				// Add claims
+				for (const auto& [id, claim] : claims)
+				{
+					jwt.set_payload_claim(id, claim);
+				}
+
+				// sign the token
+				if (std::strcmp(algorithm, "HS256") == 0)
+					return jwt.sign(jwt::algorithm::hs256{ public_key });
+				if (std::strcmp(algorithm, "RS256") == 0)
+					return jwt.sign(jwt::algorithm::rs256{ public_key, private_key });
+				
+				pModuleManager->ErrorPrintf("Error @ jwtSign, invalid algorithm has been passed.\n");
+				return {};
+			} catch(exception& e)
 			{
-				jwt.set_payload_claim(id, claim);
+				std::stringstream ss;
+				ss << "Bad Argument @ jwtSign, " << e.what() << ".\n";
+				pModuleManager->ErrorPrintf(ss.str().c_str());
+
+				return {};
 			}
-
-			// sign the token
-			if (std::strcmp(algorithm, "HS256") == 0)
-				return jwt.sign(jwt::algorithm::hs256{ public_key });
-			if (std::strcmp(algorithm, "RS256") == 0)
-				return jwt.sign(jwt::algorithm::rs256{ public_key, private_key });
-			
-			pModuleManager->ErrorPrintf("Error @ jwtSign, invalid algorithm has been passed.\n");
-			return {};
-		} catch(exception& e)
+		}, [lua_vm = lua_getmainstate(lua_vm), func_ref](const std::optional<std::any>& result)
 		{
-			std::stringstream ss;
-			ss << "Bad Argument @ jwtSign, " << e.what() << "\n";
-			pModuleManager->ErrorPrintf(ss.str().c_str());
+			// Validate LuaVM (use ResourceStart/-Stop to manage valid lua states)
+			if (!g_Module->HasLuaVM(lua_vm))
+				return;
 
-			return {};
-		}
-	}, [lua_vm = lua_getmainstate(lua_vm), func_ref](const std::optional<std::any>& result)
-	{
-		// Validate LuaVM (use ResourceStart/-Stop to manage valid lua states)
-		if (!g_Module->HasLuaVM(lua_vm))
-			return;
+			// Push stored reference to callback function to the stack
+			lua_rawgeti(lua_vm, LUA_REGISTRYINDEX, func_ref);
 
-		// Push stored reference to callback function to the stack
-		lua_rawgeti(lua_vm, LUA_REGISTRYINDEX, func_ref);
-
-		// Push token
-		try {
-			if (result.has_value()) {
-				const auto token = std::any_cast<std::string>(result.value()); // might throw bad_any_cast
-				lua_pushstring(lua_vm, token.c_str());
-			} else
+			// Push token
+			try {
+				if (result.has_value()) {
+					const auto token = std::any_cast<std::string>(result.value()); // might throw bad_any_cast
+					lua_pushstring(lua_vm, token.c_str());
+				} else
+				{
+					lua_pushboolean(lua_vm, false);
+				}
+			} catch (exception&)
 			{
 				lua_pushboolean(lua_vm, false);
 			}
-		} catch (exception&)
-		{
-			lua_pushboolean(lua_vm, false);
-		}
 
-		// Finally, call the function
-		const auto err = lua_pcall(lua_vm, 1, 0, 0);
-		if (err != 0)
-			pModuleManager->ErrorPrintf("%s\n", lua_tostring(lua_vm, -1));
-	});
+			// Finally, call the function
+			const auto err = lua_pcall(lua_vm, 1, 0, 0);
+			if (err != 0)
+				pModuleManager->ErrorPrintf("%s\n", lua_tostring(lua_vm, -1));
+		});
 
-	lua_pushboolean(lua_vm, true);
-	return 1;
+		lua_pushboolean(lua_vm, true);
+		return 1;
+	} catch (runtime_error& e)
+	{
+		std::stringstream ss;
+		ss << "Bad Argument @ jwtSign, " << e.what() << ".\n";
+		pModuleManager->ErrorPrintf(ss.str().c_str());
+		lua_pushboolean(lua_vm, false);
+		return 1;
+	}
 }
 
 int CFunctions::verify_jwt_token(lua_State* lua_vm)
@@ -120,78 +124,82 @@ int CFunctions::verify_jwt_token(lua_State* lua_vm)
 		return 1;
 	}
 
-	// Save reference of the Lua callback function
-	// See: http://lua-users.org/lists/lua-l/2008-12/msg00193.html
-	lua_pushvalue(lua_vm, 1);
-	const auto func_ref         = luaL_ref(lua_vm, LUA_REGISTRYINDEX);
+	try {
+		// Save reference of the Lua callback function
+		// See: http://lua-users.org/lists/lua-l/2008-12/msg00193.html
+		lua_pushvalue(lua_vm, 1);
+		const auto func_ref         = luaL_ref(lua_vm, LUA_REGISTRYINDEX);
 
-	// Read other arguments
-	const auto token            = lua_tostring(lua_vm, 2);
-	const auto public_key_path  = lua_tostring(lua_vm, 3);
-	std::string public_key      = public_key_path;
+		// Read other arguments
+		const auto token            = lua_tostring(lua_vm, 2);
+		const auto public_key_path  = lua_tostring(lua_vm, 3);
+		std::string public_key      = public_key_path;
 
-	// Read public- and private key from files
-	const auto is_file_path     = lua_type(lua_vm, 4) != LUA_TNONE && lua_toboolean(lua_vm, 4);
-	if (is_file_path)
-	{
-		if (!Crypto::read_key(lua_vm, public_key_path, public_key))
+		// Read public- and private key from files
+		const auto is_file_path     = lua_type(lua_vm, 4) != LUA_TNONE && lua_toboolean(lua_vm, 4);
+		if (is_file_path)
 		{
-			pModuleManager->ErrorPrintf("Bad argument @ jwtVerify\n");
-			lua_pushboolean(lua_vm, false);
-			return 1;
+			Crypto::read_key(lua_vm, public_key_path, public_key);
 		}
+
+		g_Module->GetJobManager().PushTask([/* lua_vm, */ token, public_key]() -> const std::optional<std::any>
+		{
+			// Process verification
+			try {
+				const auto decoded_jwt = jwt::decode(token);
+				const auto algorithm = decoded_jwt.get_algorithm().c_str();
+				auto verifier = jwt::verify();
+
+				// set verifier algorithm
+				if (std::strcmp(algorithm, "HS256") == 0)
+					verifier.allow_algorithm(jwt::algorithm::hs256{ public_key });
+				else if (std::strcmp(algorithm, "RS256") == 0)
+					verifier.allow_algorithm(jwt::algorithm::rs256{ public_key });
+
+				verifier.verify(decoded_jwt);
+
+				return true;
+			} catch (exception& e)
+			{
+				std::stringstream ss;
+				ss << "Bad Argument @ jwtVerify, " << e.what() << ".\n";
+				pModuleManager->ErrorPrintf(ss.str().c_str());
+
+				return false;
+			}
+		}, [lua_vm = lua_getmainstate(lua_vm), func_ref](const std::optional<std::any>& result)
+		{
+			// Validate LuaVM (use ResourceStart/-Stop to manage valid lua states)
+			if (!g_Module->HasLuaVM(lua_vm))
+				return;
+
+			// Push stored reference to callback function to the stack
+			lua_rawgeti(lua_vm, LUA_REGISTRYINDEX, func_ref);
+
+			// Push token
+			try {
+				lua_pushboolean(lua_vm, result.has_value() && std::any_cast<bool>(result.value())); // might throw bad_any_cast
+			} catch (exception&)
+			{
+				lua_pushboolean(lua_vm, false);
+			}
+
+			// Finally, call the function
+			const auto err = lua_pcall(lua_vm, 1, 0, 0);
+			if (err != 0)
+				pModuleManager->ErrorPrintf("%s\n", lua_tostring(lua_vm, -1));
+		});
+
+		lua_pushboolean(lua_vm, true);
+		return 1;
+	} catch(runtime_error& e)
+	{
+		std::stringstream ss;
+		ss << "Bad Argument @ jwtVerify, " << e.what() << ".\n";
+		pModuleManager->ErrorPrintf(ss.str().c_str());
+		lua_pushboolean(lua_vm, false);
+		return 1;
 	}
-
-	g_Module->GetJobManager().PushTask([/* lua_vm, */ token, public_key]() -> const std::optional<std::any>
-	{
-		// Process verification
-		try {
-			const auto decoded_jwt = jwt::decode(token);
-			const auto algorithm = decoded_jwt.get_algorithm().c_str();
-			auto verifier = jwt::verify();
-
-			// set verifier algorithm
-			if (std::strcmp(algorithm, "HS256") == 0)
-				verifier.allow_algorithm(jwt::algorithm::hs256{ public_key });
-			else if (std::strcmp(algorithm, "RS256") == 0)
-				verifier.allow_algorithm(jwt::algorithm::rs256{ public_key });
-
-			verifier.verify(decoded_jwt);
-
-			return true;
-		} catch (exception& e)
-		{
-			std::stringstream ss;
-			ss << "Bad Argument @ jwtVerify, " << e.what() << "\n";
-			pModuleManager->ErrorPrintf(ss.str().c_str());
-
-			return false;
-		}
-	}, [lua_vm = lua_getmainstate(lua_vm), func_ref](const std::optional<std::any>& result)
-	{
-		// Validate LuaVM (use ResourceStart/-Stop to manage valid lua states)
-		if (!g_Module->HasLuaVM(lua_vm))
-			return;
-
-		// Push stored reference to callback function to the stack
-		lua_rawgeti(lua_vm, LUA_REGISTRYINDEX, func_ref);
-
-		// Push token
-		try {
-			lua_pushboolean(lua_vm, result.has_value() && std::any_cast<bool>(result.value())); // might throw bad_any_cast
-		} catch (exception&)
-		{
-			lua_pushboolean(lua_vm, false);
-		}
-
-		// Finally, call the function
-		const auto err = lua_pcall(lua_vm, 1, 0, 0);
-		if (err != 0)
-			pModuleManager->ErrorPrintf("%s\n", lua_tostring(lua_vm, -1));
-	});
-
-	lua_pushboolean(lua_vm, true);
-	return 1;
 }
 
 int CFunctions::get_jwt_claims(lua_State* lua_vm)
@@ -223,7 +231,7 @@ int CFunctions::get_jwt_claims(lua_State* lua_vm)
 	} catch  (exception& e)
 	{
 		std::stringstream ss;
-		ss << "Bad Argument @ jwtGetClaims, " << e.what();
+		ss << "Bad Argument @ jwtGetClaims, " << e.what() << ".\n";
 		pModuleManager->ErrorPrintf(ss.str().c_str());
 
 		lua_pushboolean(lua_vm, false);
