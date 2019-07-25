@@ -68,7 +68,6 @@ int CFunctions::sign_jwt_token(lua_State* lua_vm)
 					break;
 				}
 				
-				
 				pModuleManager->ErrorPrintf("Error @ jwtSign, invalid algorithm has been passed.\n");
 				return {};
 			} catch(exception& e)
