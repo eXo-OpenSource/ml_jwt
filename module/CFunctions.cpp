@@ -1,12 +1,11 @@
-#include "CFunctions.h"
-#include "include/ILuaModuleManager.h"
-
-#include "Module.h"
 #include <jwt-cpp/jwt.h>
 #include <sstream>
+
+#include "Module.h"
+#include "CFunctions.h"
 #include "Utils.h"
 #include "Crypto.h"
-
+	
 #ifndef _WIN32
 	#include <sys/stat.h>
 #endif

@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include <string>
+
 #include "CFunctions.h"
 
 class Crypto

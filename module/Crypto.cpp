@@ -1,6 +1,7 @@
-﻿#include "Crypto.h"
-#include <fstream>
+﻿#include <fstream>
 #include <jwt-cpp/jwt.h>
+
+#include "Crypto.h"
 #include "Utils.h"
 
 bool Crypto::read_key(lua_State* lua_vm, const std::string& key_path, std::string& key)

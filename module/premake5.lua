@@ -19,13 +19,18 @@ project "module"
 		"**.h"
 	}
 	
+	filter { "system:windows" }
+		debugdir "../mta-server"
+		
 	filter { "system:windows", "platforms:x86" }
 		links { "lua5.1.lib" }
 		links { "libcrypto.lib" }
+		debugcommand "../mta-server/MTA Server.exe"
 		
 	filter { "system:windows", "platforms:x64" }
 		links { "lua5.1_64.lib" }
 		links { "libcrypto_64.lib" }
+		debugcommand "../mta-server/MTA Server64.exe"
 
 	filter "system:linux"
 		links { "ssl", "crypto" }

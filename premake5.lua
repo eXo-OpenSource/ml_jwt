@@ -1,7 +1,7 @@
 solution "JWT"
 	configurations { "Debug", "Release" }
 	location ( "Build" )
-	startproject "test"
+	startproject "module"
 	targetdir "Bin/%{cfg.buildcfg}"
 
 	platforms { "x86", "x64" }

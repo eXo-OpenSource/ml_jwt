@@ -1,7 +1,4 @@
 #include "Module.h"
-#include <iostream>
-#include <chrono>
-#include "include/ILuaModuleManager.h"
 
 Module* g_Module = nullptr;
 
