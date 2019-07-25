@@ -26,17 +26,18 @@ bool jwtSign(function(string/boolean) callback, table claims, string algorithm, 
 * __secret/public_key_path__ Lorem ipsum
 * __private_key_path__ Lorem ipsum
 
-Returns the __true__ if everything went fine, __false__ otherwise.
+Returns __true__ if everything went fine, __false__ otherwise.
 
 ### Function: `jwtVerify`
 ```cpp
-bool jwtVerify(string token, string secret/public_key_path, bool is_file_path = false)
+bool jwtVerify(function(boolean) callback, string token, string secret/public_key_path, bool is_file_path = false)
 ```
+* __callback:__ Lorem ipsum
 * __token:__ Lorem ipsum
 * __secret/file_path__ Lorem ipsum
 * __is_file_path__ Lorem ipsum
 
-Returns __true__ if the jwt was successfully verified, __false__ otherwise.
+Returns __true__ if everything went fine, __false__ otherwise.
 
 ### Function: `jwtGetClaims`
 ```cpp
