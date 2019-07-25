@@ -12,9 +12,9 @@
 
 int CFunctions::sign_jwt_token(lua_State* lua_vm)
 {
-	// bool jwtSign(function(string/boolean) callback, table claims, string algorithm, string secret/public_key_path, string private_key_path)
-	if (lua_type(lua_vm, 1) != LUA_TFUNCTION || lua_type(lua_vm, 2) != LUA_TTABLE || lua_type(lua_vm, 3) != LUA_TLIGHTUSERDATA || lua_type(lua_vm, 4) != LUA_TSTRING || 
-		(lua_type(lua_vm, 5) != LUA_TNONE && lua_type(lua_vm, 5) != LUA_TSTRING))
+	// bool jwtSign(function(string/boolean) callback, table claims, string algorithm, string secret/private_key_path, bool is_file_path)
+	if (lua_type(lua_vm, 1) != LUA_TFUNCTION || lua_type(lua_vm, 2) != LUA_TTABLE || lua_type(lua_vm, 3) != LUA_TLIGHTUSERDATA || lua_type(lua_vm, 4) != LUA_TSTRING ||
+		(lua_type(lua_vm, 5) != LUA_TNONE && lua_type(lua_vm, 5) != LUA_TBOOLEAN))
 	{
 		pModuleManager->ErrorPrintf("Bad argument @ jwtSign\n");
 		lua_pushboolean(lua_vm, false);
@@ -30,21 +30,19 @@ int CFunctions::sign_jwt_token(lua_State* lua_vm)
 		// Read other arguments
 		const auto claims           = Utils::parse_named_table(lua_vm, 2);
 		const auto algorithm        = reinterpret_cast<jwt_algorithm*>(lua_touserdata(lua_vm, 3));
-		const auto public_key_path  = lua_tostring(lua_vm, 4);
-		const auto private_key_path = lua_tostring(lua_vm, 5);
-		std::string public_key      = public_key_path,
-	                private_key;
+		const auto private_key_path = lua_tostring(lua_vm, 4);
+		std::string private_key     = private_key_path;
 		
 		// Read public- and private key from files
-		if (lua_type(lua_vm, 5) != LUA_TNONE)
+		const auto is_file_path     = lua_type(lua_vm, 5) != LUA_TNONE && lua_toboolean(lua_vm, 5);
+		if (is_file_path)
 		{
-			Crypto::read_key_pair(lua_vm, public_key_path, public_key, private_key_path, private_key);
-			DEBUG_LOG(public_key.c_str());
+			Crypto::read_key(lua_vm, private_key_path, private_key);
 			DEBUG_LOG(private_key.c_str());
 		}
 
 		// Process signing
-		g_Module->GetJobManager().PushTask([/* lua_vm, */ claims, algorithm, public_key, private_key]() -> const std::optional<std::any>
+		g_Module->GetJobManager().PushTask([/* lua_vm, */ claims, algorithm, private_key]() -> const std::optional<std::any>
 		{
 			try {
 				const auto& now = std::chrono::system_clock::now();
@@ -61,9 +59,9 @@ int CFunctions::sign_jwt_token(lua_State* lua_vm)
 				switch((jwt_algorithm&)algorithm)
 				{
 				case JWT_ALGORITHM_HS256:
-					return jwt.sign(jwt::algorithm::hs256{ public_key });
+					return jwt.sign(jwt::algorithm::hs256{ private_key });
 				case JWT_ALGORITHM_RS256:
-					return jwt.sign(jwt::algorithm::rs256{ public_key, private_key });
+					return jwt.sign(jwt::algorithm::rs256{ "", private_key });
 				default: 
 					break;
 				}
