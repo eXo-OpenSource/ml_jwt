@@ -24,4 +24,4 @@ project "test"
 		links { "libcrypto_64.lib" }
 
 	filter "system:linux"
-		links { "ssl", "crypto" }
+		links { "crypto" }
