@@ -4,7 +4,6 @@
 #include <sstream>
 
 #include "ILuaModuleManager.h"
-#include "Build/BadArgument.h"
 
 class Utils
 {
