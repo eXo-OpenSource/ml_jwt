@@ -39,6 +39,8 @@ int CFunctions::sign_jwt_token(lua_State* lua_vm)
 		if (lua_type(lua_vm, 5) != LUA_TNONE)
 		{
 			Crypto::read_key_pair(lua_vm, public_key_path, public_key, private_key_path, private_key);
+			DEBUG_LOG(public_key.c_str());
+			DEBUG_LOG(private_key.c_str());
 		}
 
 		// Process signing
@@ -140,6 +142,7 @@ int CFunctions::verify_jwt_token(lua_State* lua_vm)
 		if (is_file_path)
 		{
 			Crypto::read_key(lua_vm, public_key_path, public_key);
+			DEBUG_LOG(public_key.c_str());
 		}
 
 		g_Module->GetJobManager().PushTask([/* lua_vm, */ token, public_key]() -> const std::optional<std::any>

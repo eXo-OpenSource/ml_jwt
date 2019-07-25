@@ -8,6 +8,12 @@
 static const int index_value = -1;
 static const int index_key   = -2;
 
+#ifdef _DEBUG
+#define DEBUG_LOG( msg )  std::cout << "[ml_jwt] " << __FILE__ << ":" << __LINE__ << ": " << msg << "\n"
+#else
+#define DEBUG_LOG( msg )
+#endif
+
 class Utils
 {
 public:
@@ -59,14 +65,18 @@ public:
 		char buf[300];
 		if (!pModuleManager->GetResourceFilePath(lua_vm, input_path.c_str(), buf, sizeof(buf)))
 		{
-			throw runtime_error("file not found");
+			stringstream ss;
+			ss << "invalid path: " << input_path;
+			throw runtime_error(ss.str());
 		}
 
 		// Check if path is valid
 		const std::string path{ buf };
 		if (path.find("..") != std::string::npos)
 		{
-			throw runtime_error("invalid path");
+			stringstream ss;
+			ss << "path is illegal: " << input_path;
+			throw runtime_error(ss.str());
 		}
 
 		formatted_path.assign(path);
