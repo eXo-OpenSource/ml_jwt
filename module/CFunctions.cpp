@@ -65,11 +65,11 @@ int CFunctions::sign_jwt_token(lua_State* lua_vm)
 				case JWT_ALGORITHM_HS512:
 					return jwt.sign(jwt::algorithm::hs512{ private_key });
 				case JWT_ALGORITHM_RS256:
-					return jwt.sign(jwt::algorithm::rs256{ "", private_key });
+					return jwt.sign(jwt::algorithm::rs256{ std::string(), private_key });
 				case JWT_ALGORITHM_RS384:
-					return jwt.sign(jwt::algorithm::rs384{ "", private_key });
+					return jwt.sign(jwt::algorithm::rs384{ std::string(), private_key });
 				case JWT_ALGORITHM_RS512:
-					return jwt.sign(jwt::algorithm::rs512{ "", private_key });
+					return jwt.sign(jwt::algorithm::rs512{ std::string(), private_key });
 				default: 
 					break;
 				}
