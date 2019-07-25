@@ -67,12 +67,12 @@ int CFunctions::sign_jwt_token(lua_State* lua_vm)
 			if (std::strcmp(algorithm, "RS256") == 0)
 				return jwt.sign(jwt::algorithm::rs256{ public_key, private_key });
 			
-			pModuleManager->ErrorPrintf("Error @ jwtSign, invalid algorithm has been passed.");
+			pModuleManager->ErrorPrintf("Error @ jwtSign, invalid algorithm has been passed.\n");
 			return {};
 		} catch(exception& e)
 		{
 			std::stringstream ss;
-			ss << "Bad Argument @ jwtSign, " << e.what();
+			ss << "Bad Argument @ jwtSign, " << e.what() << "\n";
 			pModuleManager->ErrorPrintf(ss.str().c_str());
 
 			return {};
@@ -95,8 +95,7 @@ int CFunctions::sign_jwt_token(lua_State* lua_vm)
 			{
 				lua_pushboolean(lua_vm, false);
 			}
-
-		} catch (exception& e)
+		} catch (exception&)
 		{
 			lua_pushboolean(lua_vm, false);
 		}
@@ -164,7 +163,7 @@ int CFunctions::verify_jwt_token(lua_State* lua_vm)
 		} catch (exception& e)
 		{
 			std::stringstream ss;
-			ss << "Bad Argument @ jwtVerify, " << e.what();
+			ss << "Bad Argument @ jwtVerify, " << e.what() << "\n";
 			pModuleManager->ErrorPrintf(ss.str().c_str());
 
 			return false;
@@ -181,7 +180,7 @@ int CFunctions::verify_jwt_token(lua_State* lua_vm)
 		// Push token
 		try {
 			lua_pushboolean(lua_vm, result.has_value() && std::any_cast<bool>(result.value())); // might throw bad_any_cast
-		} catch (exception& e)
+		} catch (exception&)
 		{
 			lua_pushboolean(lua_vm, false);
 		}
