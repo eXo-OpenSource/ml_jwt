@@ -41,7 +41,7 @@ public:
 
 	void PushTask(Task task, TaskCompleteCallback completeCallback)
 	{
-		std::lock_guard<std::mutex> lock{ _mutex };
+		std::lock_guard<std::recursive_mutex> lock{ _mutex };
 
 		_tasks.push({ task, completeCallback });
 	}
@@ -60,7 +60,7 @@ public:
 			}
 
 			// Get next task
-			auto& [task, completed_callback] = _tasks.front();
+			auto [task, completed_callback] = _tasks.front();
 			_tasks.pop();
 			_mutex.unlock();
 
@@ -68,14 +68,14 @@ public:
 			TaskResult result = task();
 
 			// Put result into completed tasks list
-			std::lock_guard<std::mutex> lock{ _mutex };
+			std::lock_guard<std::recursive_mutex> lock{ _mutex };
 			_completedTasks.push_back({ result, completed_callback });
 		}
 	}
 
 	void SpreadResults()
 	{
-		std::lock_guard<std::mutex> lock{ _mutex };
+		std::lock_guard<std::recursive_mutex> lock{ _mutex };
 		if (_completedTasks.empty())
 			return;
 
@@ -95,5 +95,5 @@ private:
 	std::queue<std::pair<Task, TaskCompleteCallback>> _tasks;
 	std::list<std::pair<TaskResult, TaskCompleteCallback>> _completedTasks;
 
-	std::mutex _mutex;
+	std::recursive_mutex _mutex;
 };
