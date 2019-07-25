@@ -7,11 +7,11 @@
 void Crypto::read_key(lua_State* lua_vm, const std::string& key_path, std::string& key)
 {
 	// Get real path
-	std::string formatted_path;
-	Utils::format_path(lua_vm, key_path, formatted_path);
+	std::string real_path;
+	Utils::get_real_path(lua_vm, key_path, real_path);
 
 	// Load file from filesystem
-	std::ifstream in(formatted_path);
+	std::ifstream in(real_path);
 	if (!in.good())
 	{
 		throw runtime_error("could not load key");

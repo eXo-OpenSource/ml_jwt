@@ -14,6 +14,16 @@ static const int index_key   = -2;
 #define DEBUG_LOG( msg )
 #endif
 
+enum jwt_algorithm
+{
+	JWT_ALGORITHM_HS256 = 0b1000000,
+	JWT_ALGORITHM_HS384 = 0b1000000 << 0,
+	JWT_ALGORITHM_HS512 = 0b1000000 << 1,
+	JWT_ALGORITHM_RS256 = 0b1000000 << 2,
+	JWT_ALGORITHM_RS384 = 0b1000000 << 3,
+	JWT_ALGORITHM_RS512 = 0b1000000 << 4
+};
+
 class Utils
 {
 public:
@@ -60,13 +70,13 @@ public:
 		return result;
 	}
 
-	static inline void format_path(lua_State* lua_vm, const std::string& input_path, std::string& formatted_path)
+	static inline void get_real_path(lua_State* lua_vm, const std::string& relative_path, std::string& real_path)
 	{
 		char buf[300];
-		if (!pModuleManager->GetResourceFilePath(lua_vm, input_path.c_str(), buf, sizeof(buf)))
+		if (!pModuleManager->GetResourceFilePath(lua_vm, relative_path.c_str(), buf, sizeof(buf)))
 		{
 			stringstream ss;
-			ss << "invalid path: " << input_path;
+			ss << "invalid path: " << relative_path;
 			throw runtime_error(ss.str());
 		}
 
@@ -75,10 +85,10 @@ public:
 		if (path.find("..") != std::string::npos)
 		{
 			stringstream ss;
-			ss << "path is illegal: " << input_path;
+			ss << "path is illegal: " << relative_path;
 			throw runtime_error(ss.str());
 		}
 
-		formatted_path.assign(path);
+		real_path.assign(path);
 	}
 };

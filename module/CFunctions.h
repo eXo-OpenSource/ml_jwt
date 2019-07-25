@@ -10,11 +10,18 @@ extern ILuaModuleManager10* pModuleManager;
 class CFunctions
 {
 public:
-	static inline int Test(lua_State* luaVM)
+	static inline int Test(lua_State* lua_vm)
 	{
-		lua_pushboolean(luaVM, true);
+		lua_pushboolean(lua_vm, true);
 		return 1;
 	}
+
+	static inline void register_lua_global( lua_State* lua_vm, const char* name, void* value )
+	{
+		lua_pushlightuserdata(lua_vm, value);
+		lua_setglobal(lua_vm, name);
+	}
+
 
 	static int verify_jwt_token(lua_State* lua_vm);
 	static int sign_jwt_token(lua_State* lua_vm);

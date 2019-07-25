@@ -4,6 +4,8 @@
 #include <cstring>
 #include "Module.h"
 #include <cassert>
+#include <jwt-cpp/jwt.h>
+#include "Utils.h"
 
 #ifndef WIN32
 	#include "luaimports/luaimports.linux.h"
@@ -47,6 +49,14 @@ MTAEXPORT void RegisterFunctions(lua_State* lua_vm)
 	pModuleManager->RegisterFunction(lua_vm, "jwtSign",			&CFunctions::sign_jwt_token);
 	pModuleManager->RegisterFunction(lua_vm, "jwtVerify",		&CFunctions::verify_jwt_token);
 	pModuleManager->RegisterFunction(lua_vm, "jwtGetClaims",	&CFunctions::get_jwt_claims);
+
+	// Register globals
+	CFunctions::register_lua_global(lua_vm,	"JWT_ALGORITHM_HS256", reinterpret_cast<void*>(JWT_ALGORITHM_HS256));
+	CFunctions::register_lua_global(lua_vm,	"JWT_ALGORITHM_HS384", reinterpret_cast<void*>(JWT_ALGORITHM_HS384));
+	CFunctions::register_lua_global(lua_vm,	"JWT_ALGORITHM_HS512", reinterpret_cast<void*>(JWT_ALGORITHM_HS512));
+	CFunctions::register_lua_global(lua_vm,	"JWT_ALGORITHM_RS256", reinterpret_cast<void*>(JWT_ALGORITHM_RS256));
+	CFunctions::register_lua_global(lua_vm,	"JWT_ALGORITHM_RS384", reinterpret_cast<void*>(JWT_ALGORITHM_RS384));
+	CFunctions::register_lua_global(lua_vm,	"JWT_ALGORITHM_RS512", reinterpret_cast<void*>(JWT_ALGORITHM_RS512));
 }
 
 MTAEXPORT bool DoPulse()
