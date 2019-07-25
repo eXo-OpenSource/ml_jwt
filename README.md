@@ -25,15 +25,25 @@
 * libssl-dev (for the header files)
 
 ## API
+## Globals
+### Algorithm
+* `JWT_ALGORITHM_HS256`
+* `JWT_ALGORITHM_HS384`
+* `JWT_ALGORITHM_HS512`
+* `JWT_ALGORITHM_RS256`
+* `JWT_ALGORITHM_RS384`
+* `JWT_ALGORITHM_RS512`
+
+## Functions
 ### Function: `jwtSign`
 ```cpp
-bool jwtSign(function(string/boolean) callback, table claims, string algorithm, string secret/public_key_path, string private_key_path)
+bool jwtSign(function(string/boolean) callback, table claims, JWT_ALGORITHM algorithm, string secret/private_key_path, bool is_file_path = false)
 ```
 * __callback:__ Lorem ipsum
 * __claims:__ Lorem ipsum
 * __algorithm:__ Lorem ipsum
-* __secret/public_key_path__ Lorem ipsum
-* __private_key_path__ Lorem ipsum
+* __secret/private_key_path__ Lorem ipsum
+* __is_file_path__ Lorem ipsum
 
 Returns __true__ if everything went fine, __false__ otherwise.
 

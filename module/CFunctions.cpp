@@ -60,8 +60,16 @@ int CFunctions::sign_jwt_token(lua_State* lua_vm)
 				{
 				case JWT_ALGORITHM_HS256:
 					return jwt.sign(jwt::algorithm::hs256{ private_key });
+				case JWT_ALGORITHM_HS384:
+					return jwt.sign(jwt::algorithm::hs384{ private_key });
+				case JWT_ALGORITHM_HS512:
+					return jwt.sign(jwt::algorithm::hs512{ private_key });
 				case JWT_ALGORITHM_RS256:
 					return jwt.sign(jwt::algorithm::rs256{ "", private_key });
+				case JWT_ALGORITHM_RS384:
+					return jwt.sign(jwt::algorithm::rs384{ "", private_key });
+				case JWT_ALGORITHM_RS512:
+					return jwt.sign(jwt::algorithm::rs512{ "", private_key });
 				default: 
 					break;
 				}
@@ -158,8 +166,16 @@ int CFunctions::verify_jwt_token(lua_State* lua_vm)
 				// set verifier algorithm
 				if (std::strcmp(algorithm, "HS256") == 0)
 					verifier.allow_algorithm(jwt::algorithm::hs256{ public_key });
-				else if (std::strcmp(algorithm, "RS256") == 0)
+				if (std::strcmp(algorithm, "HS384") == 0)
+					verifier.allow_algorithm(jwt::algorithm::hs384{ public_key });
+				if (std::strcmp(algorithm, "HS512") == 0)
+					verifier.allow_algorithm(jwt::algorithm::hs512{ public_key });
+				if (std::strcmp(algorithm, "RS256") == 0)
 					verifier.allow_algorithm(jwt::algorithm::rs256{ public_key });
+				if (std::strcmp(algorithm, "RS384") == 0)
+					verifier.allow_algorithm(jwt::algorithm::rs384{ public_key });
+				if (std::strcmp(algorithm, "RS512") == 0)
+					verifier.allow_algorithm(jwt::algorithm::rs512{ public_key });
 
 				verifier.verify(decoded_jwt);
 
