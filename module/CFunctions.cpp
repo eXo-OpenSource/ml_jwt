@@ -29,7 +29,7 @@ int CFunctions::sign_jwt_token(lua_State* lua_vm)
 
 		// Read other arguments
 		const auto claims           = Utils::parse_named_table(lua_vm, 2);
-		const auto algorithm        = reinterpret_cast<jwt_algorithm*>(lua_touserdata(lua_vm, 3));
+		const auto algorithm        = jwt_algorithm(reinterpret_cast<int>(lua_touserdata(lua_vm, 3)));
 		const auto private_key_path = lua_tostring(lua_vm, 4);
 		std::string private_key     = private_key_path;
 		
@@ -56,7 +56,7 @@ int CFunctions::sign_jwt_token(lua_State* lua_vm)
 					jwt.set_payload_claim(id, claim);
 				}
 
-				switch((jwt_algorithm&)algorithm)
+				switch(algorithm)
 				{
 				case JWT_ALGORITHM_HS256:
 					return jwt.sign(jwt::algorithm::hs256{ private_key });
