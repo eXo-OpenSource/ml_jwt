@@ -29,7 +29,7 @@ int CFunctions::sign_jwt_token(lua_State* lua_vm)
 
 		// Read other arguments
 		const auto claims           = Utils::parse_named_table(lua_vm, 2);
-		const auto algorithm        = jwt_algorithm(reinterpret_cast<int>(lua_touserdata(lua_vm, 3)));
+		const auto algorithm        = jwt_algorithm(reinterpret_cast<unsigned>(lua_touserdata(lua_vm, 3)));
 		const auto private_key_path = lua_tostring(lua_vm, 4);
 		std::string private_key     = private_key_path;
 		
@@ -58,17 +58,17 @@ int CFunctions::sign_jwt_token(lua_State* lua_vm)
 
 				switch(algorithm)
 				{
-				case JWT_ALGORITHM_HS256:
+				case jwt_algorithm_hs256:
 					return jwt.sign(jwt::algorithm::hs256{ private_key });
-				case JWT_ALGORITHM_HS384:
+				case jwt_algorithm_hs384:
 					return jwt.sign(jwt::algorithm::hs384{ private_key });
-				case JWT_ALGORITHM_HS512:
+				case jwt_algorithm_hs512:
 					return jwt.sign(jwt::algorithm::hs512{ private_key });
-				case JWT_ALGORITHM_RS256:
+				case jwt_algorithm_rs256:
 					return jwt.sign(jwt::algorithm::rs256{ std::string(), private_key });
-				case JWT_ALGORITHM_RS384:
+				case jwt_algorithm_rs384:
 					return jwt.sign(jwt::algorithm::rs384{ std::string(), private_key });
-				case JWT_ALGORITHM_RS512:
+				case jwt_algorithm_rs512:
 					return jwt.sign(jwt::algorithm::rs512{ std::string(), private_key });
 				default: 
 					break;

@@ -16,7 +16,7 @@ public:
 		return 1;
 	}
 
-	static inline void register_lua_global( lua_State* lua_vm, const char* name, void* value )
+	static inline void register_lua_global(lua_State* lua_vm, const char* name, void* value)
 	{
 		lua_pushlightuserdata(lua_vm, value);
 		lua_setglobal(lua_vm, name);

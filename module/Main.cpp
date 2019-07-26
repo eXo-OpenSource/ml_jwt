@@ -51,12 +51,12 @@ MTAEXPORT void RegisterFunctions(lua_State* lua_vm)
 	pModuleManager->RegisterFunction(lua_vm, "jwtGetClaims",	&CFunctions::get_jwt_claims);
 
 	// Register globals
-	CFunctions::register_lua_global(lua_vm,	"JWT_ALGORITHM_HS256", reinterpret_cast<void*>(JWT_ALGORITHM_HS256));
-	CFunctions::register_lua_global(lua_vm,	"JWT_ALGORITHM_HS384", reinterpret_cast<void*>(JWT_ALGORITHM_HS384));
-	CFunctions::register_lua_global(lua_vm,	"JWT_ALGORITHM_HS512", reinterpret_cast<void*>(JWT_ALGORITHM_HS512));
-	CFunctions::register_lua_global(lua_vm,	"JWT_ALGORITHM_RS256", reinterpret_cast<void*>(JWT_ALGORITHM_RS256));
-	CFunctions::register_lua_global(lua_vm,	"JWT_ALGORITHM_RS384", reinterpret_cast<void*>(JWT_ALGORITHM_RS384));
-	CFunctions::register_lua_global(lua_vm,	"JWT_ALGORITHM_RS512", reinterpret_cast<void*>(JWT_ALGORITHM_RS512));
+	CFunctions::register_lua_global(lua_vm,	"JWT_ALGORITHM_HS256", reinterpret_cast<void*>(jwt_algorithm_hs256));
+	CFunctions::register_lua_global(lua_vm,	"JWT_ALGORITHM_HS384", reinterpret_cast<void*>(jwt_algorithm_hs384));
+	CFunctions::register_lua_global(lua_vm,	"JWT_ALGORITHM_HS512", reinterpret_cast<void*>(jwt_algorithm_hs512));
+	CFunctions::register_lua_global(lua_vm,	"JWT_ALGORITHM_RS256", reinterpret_cast<void*>(jwt_algorithm_rs256));
+	CFunctions::register_lua_global(lua_vm,	"JWT_ALGORITHM_RS384", reinterpret_cast<void*>(jwt_algorithm_rs384));
+	CFunctions::register_lua_global(lua_vm,	"JWT_ALGORITHM_RS512", reinterpret_cast<void*>(jwt_algorithm_rs512));
 }
 
 MTAEXPORT bool DoPulse()
