@@ -14,14 +14,15 @@ static const int index_key   = -2;
 #define DEBUG_LOG( msg )
 #endif
 
-enum jwt_algorithm : unsigned
+enum jwt_algorithm : uint32_t
 {
-	jwt_algorithm_hs256 = 0b1000000 << 0,
-	jwt_algorithm_hs384 = 0b1000000 << 1,
-	jwt_algorithm_hs512 = 0b1000000 << 2,
-	jwt_algorithm_rs256 = 0b1000000 << 3,
-	jwt_algorithm_rs384 = 0b1000000 << 4,
-	jwt_algorithm_rs512 = 0b1000000 << 5
+	jwt_algorithm_none  = 0x123456789ABCDEFui32,
+	jwt_algorithm_hs256 = jwt_algorithm_none << 1,
+	jwt_algorithm_hs384 = jwt_algorithm_none << 2,
+	jwt_algorithm_hs512 = jwt_algorithm_none << 3,
+	jwt_algorithm_rs256 = jwt_algorithm_none << 4,
+	jwt_algorithm_rs384 = jwt_algorithm_none << 5,
+	jwt_algorithm_rs512 = jwt_algorithm_none << 6
 };
 
 class Utils
