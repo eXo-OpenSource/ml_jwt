@@ -16,7 +16,7 @@ static const int index_key   = -2;
 
 enum jwt_algorithm : size_t
 {
-	jwt_algorithm_none  = 0x12345678ABCDEF,
+	jwt_algorithm_none  = 0x123456789ABCDEF,
 	jwt_algorithm_hs256 = jwt_algorithm_none << 1,
 	jwt_algorithm_hs384 = jwt_algorithm_none << 2,
 	jwt_algorithm_hs512 = jwt_algorithm_none << 3,
@@ -28,7 +28,7 @@ enum jwt_algorithm : size_t
 class Utils
 {
 public:
-	static inline std::unordered_map<std::string, std::string> parse_named_table(lua_State* lua_vm, const int index)
+	static inline std::unordered_map<std::string, std::string> parse_table(lua_State* lua_vm, const int index)
 	{
 		unordered_map<std::string, std::string> result;
 
